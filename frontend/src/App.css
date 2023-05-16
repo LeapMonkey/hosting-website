@@ -1,0 +1,26 @@
+* {
+	box-sizing: border-box;
+	font-family: oxygen,
+		Segoe UI,
+		Tahoma,
+		Geneva,
+		Verdana,
+		sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, p, div ,ul,li{
+	padding: 0;
+	margin: 0;
+}
+a {
+  	text-decoration: none;
+	color: #fffc;
+}
+button {
+	outline: none;
+  border: none;
+}
+.select-search-container {
+	width: 100% !important ;
+	max-width: 300px;
+}
