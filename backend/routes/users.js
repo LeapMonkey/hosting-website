@@ -81,7 +81,7 @@ router.post("/adduser", async (req, res) => {
             password: hash,
           });
           newUser.save();
-          return res.status(200).json({ user: user });
+          return res.status(200).json({ user: newUser });
         });
       });
     }
