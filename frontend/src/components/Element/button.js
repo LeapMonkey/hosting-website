@@ -11,6 +11,7 @@ const Button = (props) => {
       radius={props.radius}
       onClick={props.onClick}
       color={props.color}
+      padding={props.padding}
     >
       {props.text}
     </Wrapper>
@@ -22,11 +23,11 @@ const Wrapper = styled(Column)`
   color: ${(props) => (props.color ? props.color : "#fff")};
   font-weight: ${(props) => (props.fweight ? props.fweight : "800")};
   font-size: ${(props) => (props.fsize ? props.fsize : "12px")};
+  padding: ${(props) => (props.padding ? props.padding : "10px")};
   border-radius: ${(props) => (props.radius ? props.radius : "100px")};
   width: 100%;
   text-align: center;
   max-width: ${(props) => props.width && props.width};
-  padding: 10px;
   :hover {
     box-shadow: 0 0 10px -1px rgba(0, 255, 0, 1);
   }

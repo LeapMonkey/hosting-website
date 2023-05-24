@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Column, Row } from "../components/Element";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { locations } from "../assets/json/location";
 import Button from "../components/Element/button";
@@ -23,12 +23,25 @@ const Purchase = () => {
   const [selectState, setSelectState] = useState();
   const [selectPeriod, setSelectPeriod] = useState();
   const [inputServer, setInputServer] = useState();
+  const navigate = useNavigate();
   const handleSliderChange = (e) => {
     setSliderValue({ ...sliderValue, [e.target.name]: e.target.value });
   };
-  console.log(sliderValue);
   const removeDuplicates = (data, key) => {
     return [...new Map(data.map((x) => [key(x), x]))];
+  };
+  const handleButtonClick = () => {
+    const data = {
+      server: selectGame,
+      mod: selectModpack,
+      myserver: inputServer,
+      resources: sliderValue,
+    };
+    navigate("/payment", {
+      state: {
+        data: data,
+      },
+    });
   };
   console.log(removeDuplicates(locations, (it) => it.Continent));
   return (
@@ -177,16 +190,17 @@ const Purchase = () => {
         </LabelTitle>
         <ButtonWrapper>
           <Button
-            text={`$ ${Math.floor(
+            text={`$ ${(
               sliderValue.slider1 * 3.62 +
-                (sliderValue.slider2 * 0.19) / 1000 +
-                sliderValue.slider3 * 0.1
-            )} USD Purchase`}
+              (sliderValue.slider2 * 0.19) / 1000 +
+              sliderValue.slider3 * 0.1
+            ).toFixed(2)} USD Purchase`}
             width="150px"
             fsize="18px"
             radius="6px"
             fweight="500"
             color="black"
+            onClick={handleButtonClick}
           />
         </ButtonWrapper>
         <LabelTitle>

@@ -21,6 +21,7 @@ const Landing = () => {
       },
     });
   };
+
   return (
     <Wrapper length={gameitems.length}>
       <Banner>
