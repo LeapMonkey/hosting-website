@@ -5,23 +5,37 @@ import GameCard from "../components/Element/Card/gameCard";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gameitems } from "../assets/json/gamedata";
+import { useEffect } from "react";
 const items = [];
 const tapitems = [{ title: "Games" }];
 
 const Landing = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const [auth, setAuth] = useState(0);
   const navigate = useNavigate();
   const handleTabClick = (index) => {
     setActiveTab(index);
   };
+  useEffect(() => {
+    if (localStorage.getItem("auth")) {
+      setAuth(true);
+    }
+  }, []);
   const handleItemClick = (data) => {
-    navigate("/purchase", {
-      state: {
-        data: data,
-      },
-    });
+    if (auth) {
+      navigate("/purchase", {
+        state: {
+          data: data,
+        },
+      });
+    } else {
+      navigate("/login", {
+        state: {
+          data: data,
+        },
+      });
+    }
   };
-
   return (
     <Wrapper length={gameitems.length}>
       <Banner>

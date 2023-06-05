@@ -23,11 +23,13 @@ const Login = () => {
     if (data.message) {
       setError(data.message);
     } else {
+      localStorage.setItem("auth", JSON.stringify(data));
       navigate("/profile", {
         state: {
           data: data,
         },
       });
+
       setLoginInfo({
         userinfo: "",
         password: "",

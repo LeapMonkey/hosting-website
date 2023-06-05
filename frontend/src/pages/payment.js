@@ -7,35 +7,48 @@ import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import bitcoin from "bitcoinjs-lib";
 import bitcoinMessage from "bitcoinjs-message";
+import getHash from "../utills/gethash";
+import { gameitems } from "../assets/json/gamedata";
+import { serviceApi } from "../action/action";
 
 const ServerInfo = () => {
   const location = useLocation();
+  const total = (
+    location.state.data.resources.slider1 * 3.62 +
+    (location.state.data.resources.slider2 * 0.19) / 1000 +
+    location.state.data.resources.slider3 * 0.1
+  ).toFixed(2);
   console.log(location.state.data);
-  const [total, setTotal] = useState(
-    (
-      location.state.data.resources.slider1 * 3.62 +
-      (location.state.data.resources.slider2 * 0.19) / 1000 +
-      location.state.data.resources.slider3 * 0.1
-    ).toFixed(2)
-  );
   const [signature, setSignature] = useState("");
-  const zelID = "1NUGNZf7j5KsSzgH79EcgsxyVCQZaW1xyE";
+  const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const zelIDPrivatekey =
-    "Kyysm2J6QNRBufym7UsGrTct3WWj5vHWTZar9N6n7uyxjxX2b2p5";
+    "L3yGy6krc9VywytHCNEQfuMdpKrPzCfqW9knYAqCyGkKFxLnoXCE";
   const [logininfo, setLoginInfo] = useState("");
+  const [transactiondata, setTransactiondata] = useState("");
+  const [registerhash, setRegisterhash] = useState("");
 
   useEffect(() => {
     getLoginData();
+    const data1 = currentBlock();
+    console.log(data1);
+    const data2 = data1 + 22000;
+    const data3 = data2 - currentBlock();
+    console.log(data3);
   }, []);
+
   const getLoginData = async () => {
-    const logininfo = await fetch(
-      "https://api.runonflux.io/id/emergencyphrase",
-      {
-        method: "get",
-      }
-    )
+    const logininfo = await fetch("https://api.runonflux.io/id/loginphrase", {
+      method: "get",
+    })
       .then((res) => res.json())
       .then((response) => response.data);
+
+    setLoginInfo(logininfo);
+    const signatureData = getSignature(logininfo);
+    setSignature(Buffer.from(signatureData).toString("base64"));
+  };
+
+  const getSignature = (logininfo) => {
     const keyPair = bitcoin.ECPair.fromWIF(zelIDPrivatekey);
     const privateKey = keyPair.d.toBuffer(32);
     // const privateKey = keyPair.privateKey;
@@ -45,8 +58,7 @@ const ServerInfo = () => {
       privateKey,
       keyPair.compressed
     );
-    setLoginInfo(logininfo);
-    setSignature(signature);
+    return signature;
   };
   // const logoutdata = async () => {
   //   await fetch("https://api.runonflux.io/zelid/logoutcurrentsession", {
@@ -63,7 +75,148 @@ const ServerInfo = () => {
   //     .then((response) => console.log(response.data))
   //     .catch((err) => console.log(err));
   // };
+  const handleStartClick = async () => {
+    await fetch("https://api.runonflux.io/apps/appstart/whitebirds/true", {
+      method: "get",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => console.log(response.data))
+      .catch((err) => console.log(err));
+  };
+  const handleStopClick = async () => {
+    await fetch("https://api.runonflux.io/apps/appstop/whitebirds/true", {
+      method: "get",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => console.log(response.data))
+      .catch((err) => console.log(err));
+  };
+  const handleReinstallClick = async () => {
+    await fetch("https://api.runonflux.io/apps/appremove/whitebirds/true", {
+      method: "get",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+    })
+      .then((res) => res.text())
+      .then((response) => {
+        const jsonArray = `[${response.replace(/}{/g, "},{")}]`;
+        JSON.parse(jsonArray).map((item) => {
+          console.log(item.status);
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+  const handleRedeployClick = async () => {
+    await fetch(
+      "https://api.runonflux.io/apps/redeploy/whitebirds/false/true",
+      {
+        method: "get",
+        headers: {
+          zelidauth: JSON.stringify({
+            zelid: zelID,
+            signature: signature,
+            loginPhrase: logininfo,
+          }),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((response) => console.log(response.data))
+      .catch((err) => console.log(err));
+  };
+  const handleHardRedeployClick = async () => {
+    await fetch("https://api.runonflux.io/apps/redeploy/whitebirds/true/true", {
+      method: "get",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => console.log(response.data))
+      .catch((err) => console.log(err));
+  };
+
+  const handleRestartClick = async () => {
+    await fetch("https://api.runonflux.io/apps/apprestart/whitebirds/true", {
+      method: "get",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+    })
+      .then((res) => res.json())
+      .then((response) => console.log(response))
+      .catch((err) => console.log(err));
+  };
+  console.log(location.state.data);
+  const currentBlock = async () => {
+    return await fetch(`https://api.runonflux.io/daemon/getblockcount`, {
+      method: "get",
+    })
+      .then((res) => res.json())
+      .then((response) => response.data)
+      .catch((err) => console.log(err));
+  };
   const handleButtonClick = async () => {
+    const data = {
+      type: "fluxappregister",
+      version: 1,
+      appSpecification: {
+        version: 6,
+        name: location.state.data.myserver,
+        description: gameitems[location.state.data.server].title,
+        owner: zelID,
+        compose: [
+          {
+            name: "wickedsensation",
+            description: gameitems[location.state.data.server].title,
+            repotag: "wickedsensation/stoneblock3:1.6.1",
+            ports: [39097, 39098],
+            domains: ["", ""],
+            environmentParameters: [],
+            commands: [],
+            containerPorts: [25565, 22],
+            containerData: "/data/world  s:/data/backups",
+            cpu: 0.1,
+            ram: 100,
+            hdd: 1,
+            tiered: false,
+          },
+        ],
+        instances: 3,
+        contacts: [],
+        geolocation: [],
+        expire: 22000,
+      },
+      timestamp: new Date().getTime(),
+    };
+
     await fetch("https://api.runonflux.io/id/verifylogin", {
       method: "post",
       body: JSON.stringify({
@@ -76,96 +229,113 @@ const ServerInfo = () => {
       .then((response) => console.log(response.data))
       .catch((err) => console.log(err));
 
-    await fetch("https://api.runonflux.io/id/providesign", {
+    const signatureinfo =
+      data.type +
+      data.version +
+      JSON.stringify(data.appSpecification) +
+      data.timestamp;
+    const signatureData = getSignature(signatureinfo);
+    console.log(signatureinfo);
+    data.signature = Buffer.from(signatureData).toString("base64");
+    const registerhash = await fetch(
+      "https://api.runonflux.io/apps/appregister",
+      {
+        method: "post",
+        headers: {
+          zelidauth: JSON.stringify({
+            zelid: zelID,
+            signature: signature,
+            loginPhrase: logininfo,
+          }),
+        },
+        body: JSON.stringify(data),
+      }
+    )
+      .then((res) => res.json())
+      .then((response) => {
+        setRegisterhash(response.data);
+        return response.data;
+      })
+      .catch((err) => console.log(err));
+
+    const paidaddress = await fetch(
+      `https://api.runonflux.io/apps/deploymentinformation`,
+      {
+        method: "get",
+        headers: {
+          zelidauth: JSON.stringify({
+            zelid: zelID,
+            signature: signature,
+            loginPhrase: logininfo,
+          }),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((response) => response.data.address)
+      .catch((err) => console.log(err));
+    const data2 = {
+      version: 6,
+      name: location.state.data.myserver,
+      description: "server",
+      owner: zelID,
+      compose: [
+        {
+          name: "wickedsensation",
+          description: "server",
+          repotag: "wickedsensation/stoneblock3:1.6.1",
+          ports: [39097, 39098],
+          domains: ["", ""],
+          environmentParameters: [],
+          commands: [],
+          containerPorts: [25565, 22],
+          containerData: "/data/world  s:/data/backups",
+          cpu: 0.1,
+          ram: 100,
+          hdd: 1,
+          tiered: false,
+        },
+      ],
+      instances: 3,
+      contacts: [],
+      geolocation: [],
+      expire: 22000,
+    };
+
+    const amount = await fetch(`https://api.runonflux.io/apps/calculateprice`, {
       method: "post",
+      body: JSON.stringify(data2),
+    })
+      .then((res) => res.json())
+      .then((response) => response.data)
+      .catch((err) => console.log(err));
+
+    const hashdata = await getHash(registerhash, amount, paidaddress);
+
+    await fetch(`https://api.runonflux.io/daemon/sendrawtransaction`, {
+      method: "post",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
       body: JSON.stringify({
-        zelid: zelID,
-        signature: signature,
-        loginPhrase: logininfo,
+        hexstring: hashdata,
+        allowhighfees: false,
       }),
     })
       .then((res) => res.json())
-      .then((response) => console.log(response.data))
+      .then((response) => setTransactiondata(response.data))
       .catch((err) => console.log(err));
-    // logoutdata();
-    // const appStart = await fetch("https://api.runonflux.io/apps/appstart", {
-    //   method: "get",
-    //   headers: {
-    //     zelidauth: {
-    //       zelid: zelID,
-    //       signature: signature,
-    //       loginPhrase: logininfo,
-    //     },
-    //   },
-    // })
-    //   .then((res) => res.json())
-    //   .then((response) => response.data)
-    //   .catch((err) => console.log(err));
 
-    // console.log(appStart, "appStart.data");
-    await fetch("https://api.runonflux.io/apps/checkdockerexistance", {
-      method: "post",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-      body: JSON.stringify({ repotag: "wickedsensation/stoneblock3:1.6.1" }),
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-    const data = {
-      appSpecification: {
-        version: 6,
-        name: "whitebird",
-        description: "server",
-        owner: zelID,
-        instances: 3,
-        contacts: [],
-        geolocation: ["acNA_US_Washington"],
-        expire: 22000,
-        compose: [
-          {
-            name: "wickedsensation",
-            description: "server",
-            repotag: "wickedsensation/stoneblock3:1.6.1",
-            ports: "[39997]",
-            domains: ["https://suoc.io"],
-            environmentParameters: [],
-            commands: [],
-            containerPorts: "[25565]",
-            containerData: "/tmp",
-            cpu: 0.5,
-            ram: 2000,
-            hdd: 40,
-            tiered: false,
-          },
-        ],
-      },
-      timestamp: new Date().getTime(),
-      signature: Buffer.from(signature).toString("base64"),
-      type: "fluxappregister",
-      version: 1,
+    const authdata = JSON.parse(localStorage.getItem("auth"));
+    const serviceData = {
+      userid: authdata.user._id,
+      name: location.state.data.myserver,
     };
-    console.log(data, "data");
-    await fetch("https://api.runonflux.io/apps/appregister", {
-      method: "post",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-    // logoutdata();
+    await serviceApi(serviceData);
   };
 
   return (
@@ -238,15 +408,106 @@ const ServerInfo = () => {
           }}
         />
         <ButtonWrapper>
+          {registerhash ? (
+            registerhash.message ? (
+              <Column>
+                <Button
+                  text="Complete Purchase"
+                  width="180px"
+                  radius="6px"
+                  fweight="500"
+                  color="black"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={handleButtonClick}
+                />
+                {registerhash.message}
+              </Column>
+            ) : (
+              <Button
+                text={<>Please check {transactiondata} link</>}
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="black"
+                fsize="16px"
+                padding="15px"
+              />
+            )
+          ) : (
+            <Button
+              text="Complete Purchase"
+              width="180px"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
+              onClick={handleButtonClick}
+            />
+          )}
+        </ButtonWrapper>
+        <ButtonWrapper>
           <Button
-            text="Complete Purchase"
+            text="Start"
             width="180px"
             radius="6px"
             fweight="500"
             color="black"
             fsize="16px"
             padding="15px"
-            onClick={handleButtonClick}
+            onClick={handleStartClick}
+          />
+          <Button
+            text="Stop"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleStopClick}
+          />
+          <Button
+            text="Restart"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleRestartClick}
+          />
+          <Button
+            text="Reinstall App"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleReinstallClick}
+          />
+
+          <Button
+            text="Clean SSD"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleHardRedeployClick}
+          />
+          <Button
+            text="Move Server"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleRedeployClick}
           />
         </ButtonWrapper>
       </PaymentPart>
@@ -292,6 +553,9 @@ const BoldTitle = styled.div`
 `;
 const ButtonWrapper = styled(Row)`
   justify-content: center;
+  gap: 20px;
   width: 100%;
+  flex-wrap: wrap;
 `;
 export default ServerInfo;
+                                  

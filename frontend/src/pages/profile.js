@@ -1,25 +1,38 @@
 import styled from "styled-components";
 import { Column, Row } from "../components/Element";
-import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useState } from "react";
+import { getServiceApi } from "../action/action";
 
 const Profile = () => {
-  const location = useLocation();
-  console.log(location.state.data.user.username);
+  const [auth, setAuth] = useState();
+  const [serviceData, setServiceData] = useState();
+  const initialData = async () => {
+    const authdata = JSON.parse(localStorage.getItem("auth"));
+    setAuth(authdata.user);
+    const response = await getServiceApi();
+    setServiceData(
+      response.serviceData.filter((item) => item.userid === authdata.user._id)
+    );
+  };
+  useEffect(() => {
+    initialData();
+  }, []);
+
   return (
     <Wrapper>
       <WrapperContainer>
-        {" "}
         <UserInfoGroup>
-          {location.state.data.user.username}
-          <DefaultText>{location.state.data.user.email}</DefaultText>
+          {auth?.username}
+          <DefaultText>{auth?.email}</DefaultText>
         </UserInfoGroup>
         <UserServerGroup>
           <ColumnData>
             <DefaultTitle>Servers</DefaultTitle>
-            <DefaultText>The Minecraft Server</DefaultText>
-            <DefaultText>Awesome Valheim Server</DefaultText>
-            <DefaultText>Crazy Craft</DefaultText>
+            {serviceData &&
+              serviceData.map((item) => <DefaultText>{item.name}</DefaultText>)}
           </ColumnData>
+
           <ColumnData>
             <DefaultTitle>End Date</DefaultTitle>
             <DefaultText>9/6/23</DefaultText>
