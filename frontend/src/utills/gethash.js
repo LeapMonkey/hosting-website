@@ -10,6 +10,7 @@ const getHash = async (registerhash, mount, paidaddress) => {
   //   console.log(pubKey);
   // Public Key: 029885d0696ed13d41af374c00345d6b4aa9c256f2147664fac95c772b7c122dc6
   // Private Key: KwkRTaKT2UTgxATu6et3ZwNHK3fRGzYjz8waJdf37LF8bjdWLFP9
+  console.log(registerhash, "registerhash");
   try {
     const network = bitgotx.networks.zelcash;
     const publickey = [

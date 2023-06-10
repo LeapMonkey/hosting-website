@@ -9,6 +9,7 @@ router.post("/save", async (req, res) => {
     const serviceData = new Service({
       name: req.body.name,
       userid: req.body.userid,
+      currentBlockData: req.body.currentBlockData,
     });
     serviceData.save();
     return res.status(200).json({ message: "success" });
@@ -20,6 +21,37 @@ router.post("/save", async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const serviceData = await Service.find();
+    return res.status(200).json({
+      serviceData,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    console.log(req.body);
+    if (req.body.userid && req.body.name) {
+      const serviceData = await Service.find();
+      const filterdata = serviceData.filter(
+        (data) => data.userid === req.body.userid && data.name === req.body.name
+      );
+      return res.status(200).json({
+        filterdata,
+      });
+    }
+    console.log("error");
+  } catch (err) {
+    console.log(err);
+  }
+});
+router.post("/update", async (req, res) => {
+  try {
+    const serviceData = await Service.findOneAndUpdate(
+      req.body.serverid,
+      req.body
+    );
     return res.status(200).json({
       serviceData,
     });

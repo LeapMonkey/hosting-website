@@ -9,7 +9,12 @@ import bitcoin from "bitcoinjs-lib";
 import bitcoinMessage from "bitcoinjs-message";
 import getHash from "../utills/gethash";
 import { gameitems } from "../assets/json/gamedata";
-import { serviceApi } from "../action/action";
+import {
+  getServiceApi,
+  getUserService,
+  serviceApi,
+  updateUserService,
+} from "../action/action";
 
 const ServerInfo = () => {
   const location = useLocation();
@@ -26,14 +31,10 @@ const ServerInfo = () => {
   const [logininfo, setLoginInfo] = useState("");
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
+  const [updatehash, setUpdatehash] = useState("");
 
   useEffect(() => {
     getLoginData();
-    const data1 = currentBlock();
-    console.log(data1);
-    const data2 = data1 + 22000;
-    const data3 = data2 - currentBlock();
-    console.log(data3);
   }, []);
 
   const getLoginData = async () => {
@@ -175,14 +176,7 @@ const ServerInfo = () => {
       .catch((err) => console.log(err));
   };
   console.log(location.state.data);
-  const currentBlock = async () => {
-    return await fetch(`https://api.runonflux.io/daemon/getblockcount`, {
-      method: "get",
-    })
-      .then((res) => res.json())
-      .then((response) => response.data)
-      .catch((err) => console.log(err));
-  };
+
   const handleButtonClick = async () => {
     const data = {
       type: "fluxappregister",
@@ -274,6 +268,7 @@ const ServerInfo = () => {
       .then((res) => res.json())
       .then((response) => response.data.address)
       .catch((err) => console.log(err));
+
     const data2 = {
       version: 6,
       name: location.state.data.myserver,
@@ -331,11 +326,181 @@ const ServerInfo = () => {
       .catch((err) => console.log(err));
 
     const authdata = JSON.parse(localStorage.getItem("auth"));
+    // eslint-disable-next-line no-use-before-define
+    const currentBlockData = await currentBlock();
     const serviceData = {
       userid: authdata.user._id,
       name: location.state.data.myserver,
+      currentBlockData: currentBlockData + 22000,
     };
     await serviceApi(serviceData);
+  };
+
+  const currentBlock = async () => {
+    return await fetch(`https://api.runonflux.io/daemon/getblockcount`, {
+      method: "get",
+    })
+      .then((res) => res.json())
+      .then((response) => response.data)
+      .catch((err) => console.log(err));
+  };
+  const handleUpdateServer = async () => {
+    const authdata = JSON.parse(localStorage.getItem("auth"));
+    const resdata = await getUserService({
+      userid: authdata.user._id,
+      name: location.state.data.myserver,
+    });
+    const currentBlockData = await currentBlock();
+    const expire =
+      Math.round(
+        (resdata?.filterdata[0]?.currentBlockData - currentBlockData) / 1000
+      ) * 1000;
+
+    console.log(expire, "block");
+    const data = {
+      type: "fluxappupdate",
+      version: 1,
+      appSpecification: {
+        version: 6,
+        name: location.state.data.myserver,
+        description: gameitems[location.state.data.server].title,
+        owner: zelID,
+        compose: [
+          {
+            name: "wickedsensation",
+            description: gameitems[location.state.data.server].title,
+            repotag: "wickedsensation/stoneblock3:1.6.1",
+            ports: [39097, 39098],
+            domains: ["", ""],
+            environmentParameters: [],
+            commands: [],
+            containerPorts: [25565, 22],
+            containerData: "/data/world  s:/data/backups",
+            cpu: 0.2,
+            ram: 200,
+            hdd: 1,
+            tiered: false,
+          },
+        ],
+        instances: 3,
+        contacts: [],
+        geolocation: [],
+        expire: expire,
+      },
+      timestamp: new Date().getTime(),
+    };
+    const signatureinfo =
+      data.type +
+      data.version +
+      JSON.stringify(data.appSpecification) +
+      data.timestamp;
+    const signatureData = getSignature(signatureinfo);
+    console.log(signatureinfo);
+    data.signature = Buffer.from(signatureData).toString("base64");
+    const updatehash = await fetch("https://api.runonflux.io/apps/appupdate", {
+      method: "post",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        setUpdatehash(response.data);
+        return response.data;
+      })
+      .catch((err) => console.log(err));
+    const paidaddress = await fetch(
+      `https://api.runonflux.io/apps/deploymentinformation`,
+      {
+        method: "get",
+        headers: {
+          zelidauth: JSON.stringify({
+            zelid: zelID,
+            signature: signature,
+            loginPhrase: logininfo,
+          }),
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then((response) => response.data.address)
+      .catch((err) => console.log(err));
+    const data2 = {
+      version: 6,
+      name: location.state.data.myserver,
+      description: "server",
+      owner: zelID,
+      compose: [
+        {
+          name: "wickedsensation",
+          description: "server",
+          repotag: "wickedsensation/stoneblock3:1.6.1",
+          ports: [39097, 39098],
+          domains: ["", ""],
+          environmentParameters: [],
+          commands: [],
+          containerPorts: [25565, 22],
+          containerData: "/data/world  s:/data/backups",
+          cpu: 0.1,
+          ram: 200,
+          hdd: 1,
+          tiered: false,
+        },
+      ],
+      instances: 3,
+      contacts: [],
+      geolocation: [],
+      expire: 22000,
+    };
+
+    const amount = await fetch(`https://api.runonflux.io/apps/calculateprice`, {
+      method: "post",
+      body: JSON.stringify(data2),
+    })
+      .then((res) => res.json())
+      .then((response) => response.data)
+      .catch((err) => console.log(err));
+
+    const hashdata = await getHash(updatehash, amount, paidaddress);
+
+    await fetch(`https://api.runonflux.io/daemon/sendrawtransaction`, {
+      method: "post",
+      headers: {
+        zelidauth: JSON.stringify({
+          zelid: zelID,
+          signature: signature,
+          loginPhrase: logininfo,
+        }),
+      },
+      body: JSON.stringify({
+        hexstring: hashdata,
+        allowhighfees: false,
+      }),
+    })
+      .then((res) => res.json())
+      .then((response) => setTransactiondata(response.data))
+      .catch((err) => console.log(err));
+    // eslint-disable-next-line no-use-before-define
+    const service = await getServiceApi();
+    console.log(service, "filter");
+
+    const filterdata = service.serviceData.filter(
+      (data) =>
+        data.userid === authdata.user._id &&
+        data.name === location.state.data.myserver
+    );
+    const serviceData = {
+      serverid: filterdata[0]._id,
+      userid: authdata.user._id,
+      name: location.state.data.myserver,
+      currentBlockData: expire + currentBlockData,
+    };
+    await updateUserService(serviceData);
   };
 
   return (
@@ -510,6 +675,18 @@ const ServerInfo = () => {
             onClick={handleRedeployClick}
           />
         </ButtonWrapper>
+        <ButtonWrapper>
+          <Button
+            text="Update Server"
+            width="180px"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={handleUpdateServer}
+          />
+        </ButtonWrapper>
       </PaymentPart>
     </Wrapper>
   );
@@ -558,4 +735,3 @@ const ButtonWrapper = styled(Row)`
   flex-wrap: wrap;
 `;
 export default ServerInfo;
-                                  

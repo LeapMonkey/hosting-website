@@ -7,6 +7,9 @@ const ServiceSchema = new mongoose.Schema({
   userid: {
     type: String,
   },
+  currentBlockData: {
+    type: Number,
+  },
 });
 
 export default mongoose.model("Service", ServiceSchema);
