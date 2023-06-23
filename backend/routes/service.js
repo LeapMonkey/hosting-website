@@ -10,6 +10,8 @@ router.post("/save", async (req, res) => {
       name: req.body.name,
       userid: req.body.userid,
       currentBlockData: req.body.currentBlockData,
+      servername: req.body.servername,
+      port: req.body.port,
     });
     serviceData.save();
     return res.status(200).json({ message: "success" });
@@ -32,10 +34,12 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     console.log(req.body);
-    if (req.body.userid && req.body.name) {
+    if (req.body.userid && req.body.servername) {
       const serviceData = await Service.find();
       const filterdata = serviceData.filter(
-        (data) => data.userid === req.body.userid && data.name === req.body.name
+        (data) =>
+          data.userid === req.body.userid &&
+          data.servername === req.body.servername
       );
       return res.status(200).json({
         filterdata,

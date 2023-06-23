@@ -5,62 +5,59 @@ import Paypal from "../components/Paypal";
 import CoinbaseCommerceButton from "react-coinbase-commerce";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import bitcoin from "bitcoinjs-lib";
-import bitcoinMessage from "bitcoinjs-message";
 import getHash from "../utills/gethash";
-import { gameitems } from "../assets/json/gamedata";
 import {
   getServiceApi,
   getUserService,
   serviceApi,
   updateUserService,
 } from "../action/action";
+import {
+  currentBlock,
+  getAmout,
+  getFluxAuth,
+  getPaidaddress,
+} from "../utills/manager";
+import bitcoin from "bitcoinjs-lib";
+import bitcoinMessage from "bitcoinjs-message";
+import { getRandomNumber } from "../utills";
 
 const ServerInfo = () => {
   const location = useLocation();
-  const total = (
-    location.state.data.resources.slider1 * 3.62 +
-    (location.state.data.resources.slider2 * 0.19) / 1000 +
-    location.state.data.resources.slider3 * 0.1
-  ).toFixed(2);
-  console.log(location.state.data);
-  const [signature, setSignature] = useState("");
+  const total =
+    location.state.flag === 1
+      ? location.state.data.price1
+      : location.state.data.price2;
+  const cpu =
+    location.state.flag === 1
+      ? location.state.data.cpu1
+      : location.state.data.cpu2;
+  const ram =
+    location.state.flag === 1
+      ? location.state.data.ram1
+      : location.state.data.ram2;
+  const hdd =
+    location.state.flag === 1
+      ? location.state.data.ssd1
+      : location.state.data.ssd2;
   const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const zelIDPrivatekey =
     "L3yGy6krc9VywytHCNEQfuMdpKrPzCfqW9knYAqCyGkKFxLnoXCE";
-  const [logininfo, setLoginInfo] = useState("");
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
   const [updatehash, setUpdatehash] = useState("");
+  const [servicenumber, setServiceNumber] = useState();
+  const initialData = async () => {
+    getFluxAuth();
+    const data = await getServiceApi();
+    console.log(data.serviceData.length);
+    setServiceNumber(data.serviceData.length);
+  };
 
   useEffect(() => {
-    getLoginData();
+    initialData();
   }, []);
 
-  const getLoginData = async () => {
-    const logininfo = await fetch("https://api.runonflux.io/id/loginphrase", {
-      method: "get",
-    })
-      .then((res) => res.json())
-      .then((response) => response.data);
-
-    setLoginInfo(logininfo);
-    const signatureData = getSignature(logininfo);
-    setSignature(Buffer.from(signatureData).toString("base64"));
-  };
-
-  const getSignature = (logininfo) => {
-    const keyPair = bitcoin.ECPair.fromWIF(zelIDPrivatekey);
-    const privateKey = keyPair.d.toBuffer(32);
-    // const privateKey = keyPair.privateKey;
-    const message = logininfo;
-    const signature = bitcoinMessage.sign(
-      message,
-      privateKey,
-      keyPair.compressed
-    );
-    return signature;
-  };
   // const logoutdata = async () => {
   //   await fetch("https://api.runonflux.io/zelid/logoutcurrentsession", {
   //     method: "get",
@@ -76,106 +73,6 @@ const ServerInfo = () => {
   //     .then((response) => console.log(response.data))
   //     .catch((err) => console.log(err));
   // };
-  const handleStartClick = async () => {
-    await fetch("https://api.runonflux.io/apps/appstart/whitebirds/true", {
-      method: "get",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-  };
-  const handleStopClick = async () => {
-    await fetch("https://api.runonflux.io/apps/appstop/whitebirds/true", {
-      method: "get",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-  };
-  const handleReinstallClick = async () => {
-    await fetch("https://api.runonflux.io/apps/appremove/whitebirds/true", {
-      method: "get",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-    })
-      .then((res) => res.text())
-      .then((response) => {
-        const jsonArray = `[${response.replace(/}{/g, "},{")}]`;
-        JSON.parse(jsonArray).map((item) => {
-          console.log(item.status);
-        });
-      })
-      .catch((err) => console.log(err));
-  };
-  const handleRedeployClick = async () => {
-    await fetch(
-      "https://api.runonflux.io/apps/redeploy/whitebirds/false/true",
-      {
-        method: "get",
-        headers: {
-          zelidauth: JSON.stringify({
-            zelid: zelID,
-            signature: signature,
-            loginPhrase: logininfo,
-          }),
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-  };
-  const handleHardRedeployClick = async () => {
-    await fetch("https://api.runonflux.io/apps/redeploy/whitebirds/true/true", {
-      method: "get",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
-  };
-
-  const handleRestartClick = async () => {
-    await fetch("https://api.runonflux.io/apps/apprestart/whitebirds/true", {
-      method: "get",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response))
-      .catch((err) => console.log(err));
-  };
-  console.log(location.state.data);
 
   const handleButtonClick = async () => {
     const data = {
@@ -183,20 +80,20 @@ const ServerInfo = () => {
       version: 1,
       appSpecification: {
         version: 6,
-        name: location.state.data.myserver,
-        description: gameitems[location.state.data.server].title,
+        name: `cubehosting${servicenumber}`,
+        description: location.state.data.title,
         owner: zelID,
         compose: [
           {
-            name: "wickedsensation",
-            description: gameitems[location.state.data.server].title,
-            repotag: "wickedsensation/stoneblock3:1.6.1",
-            ports: [39097, 39098],
-            domains: ["", ""],
-            environmentParameters: [],
+            name: getRandomNumber(),
+            description: location.state.data.title,
+            repotag: location.state.data.repotag,
+            ports: location.state.data.port,
+            domains: location.state.data.domains,
+            environmentParameters: location.state.data.environmentParameters,
             commands: [],
-            containerPorts: [25565, 22],
-            containerData: "/data/world  s:/data/backups",
+            containerPorts: location.state.data.containerPorts,
+            containerData: location.state.data.containerData,
             cpu: 0.1,
             ram: 100,
             hdd: 1,
@@ -205,30 +102,25 @@ const ServerInfo = () => {
         ],
         instances: 3,
         contacts: [],
-        geolocation: [],
+        geolocation: ["acNA"],
         expire: 22000,
       },
       timestamp: new Date().getTime(),
     };
-
-    await fetch("https://api.runonflux.io/id/verifylogin", {
-      method: "post",
-      body: JSON.stringify({
-        zelid: zelID,
-        signature: signature,
-        loginPhrase: logininfo,
-      }),
-    })
-      .then((res) => res.json())
-      .then((response) => console.log(response.data))
-      .catch((err) => console.log(err));
 
     const signatureinfo =
       data.type +
       data.version +
       JSON.stringify(data.appSpecification) +
       data.timestamp;
-    const signatureData = getSignature(signatureinfo);
+    const keyPair = bitcoin.ECPair.fromWIF(zelIDPrivatekey);
+    const privateKey = keyPair.d.toBuffer(32);
+    const message = signatureinfo;
+    const signatureData = bitcoinMessage.sign(
+      message,
+      privateKey,
+      keyPair.compressed
+    );
     console.log(signatureinfo);
     data.signature = Buffer.from(signatureData).toString("base64");
     const registerhash = await fetch(
@@ -236,11 +128,7 @@ const ServerInfo = () => {
       {
         method: "post",
         headers: {
-          zelidauth: JSON.stringify({
-            zelid: zelID,
-            signature: signature,
-            loginPhrase: logininfo,
-          }),
+          zelidauth: localStorage.getItem("fluxauth"),
         },
         body: JSON.stringify(data),
       }
@@ -252,255 +140,46 @@ const ServerInfo = () => {
       })
       .catch((err) => console.log(err));
 
-    const paidaddress = await fetch(
-      `https://api.runonflux.io/apps/deploymentinformation`,
+    const paidaddress = await getPaidaddress();
+
+    const amount = await getAmout(0.1, 100, 1, 22000);
+
+    console.log(registerhash, amount, paidaddress, "paidaddress");
+    const hashdata = await getHash(registerhash, amount, paidaddress);
+    console.log(hashdata);
+
+    const transaction = await fetch(
+      `https://api.runonflux.io/daemon/sendrawtransaction`,
       {
-        method: "get",
+        method: "post",
         headers: {
-          zelidauth: JSON.stringify({
-            zelid: zelID,
-            signature: signature,
-            loginPhrase: logininfo,
-          }),
+          zelidauth: localStorage.getItem("fluxauth"),
         },
+        body: JSON.stringify({
+          hexstring: hashdata,
+          allowhighfees: false,
+        }),
       }
     )
       .then((res) => res.json())
-      .then((response) => response.data.address)
-      .catch((err) => console.log(err));
-
-    const data2 = {
-      version: 6,
-      name: location.state.data.myserver,
-      description: "server",
-      owner: zelID,
-      compose: [
-        {
-          name: "wickedsensation",
-          description: "server",
-          repotag: "wickedsensation/stoneblock3:1.6.1",
-          ports: [39097, 39098],
-          domains: ["", ""],
-          environmentParameters: [],
-          commands: [],
-          containerPorts: [25565, 22],
-          containerData: "/data/world  s:/data/backups",
-          cpu: 0.1,
-          ram: 100,
-          hdd: 1,
-          tiered: false,
-        },
-      ],
-      instances: 3,
-      contacts: [],
-      geolocation: [],
-      expire: 22000,
-    };
-
-    const amount = await fetch(`https://api.runonflux.io/apps/calculateprice`, {
-      method: "post",
-      body: JSON.stringify(data2),
-    })
-      .then((res) => res.json())
-      .then((response) => response.data)
-      .catch((err) => console.log(err));
-
-    const hashdata = await getHash(registerhash, amount, paidaddress);
-
-    await fetch(`https://api.runonflux.io/daemon/sendrawtransaction`, {
-      method: "post",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-      body: JSON.stringify({
-        hexstring: hashdata,
-        allowhighfees: false,
-      }),
-    })
-      .then((res) => res.json())
-      .then((response) => setTransactiondata(response.data))
-      .catch((err) => console.log(err));
-
-    const authdata = JSON.parse(localStorage.getItem("auth"));
-    // eslint-disable-next-line no-use-before-define
-    const currentBlockData = await currentBlock();
-    const serviceData = {
-      userid: authdata.user._id,
-      name: location.state.data.myserver,
-      currentBlockData: currentBlockData + 22000,
-    };
-    await serviceApi(serviceData);
-  };
-
-  const currentBlock = async () => {
-    return await fetch(`https://api.runonflux.io/daemon/getblockcount`, {
-      method: "get",
-    })
-      .then((res) => res.json())
-      .then((response) => response.data)
-      .catch((err) => console.log(err));
-  };
-  const handleUpdateServer = async () => {
-    const authdata = JSON.parse(localStorage.getItem("auth"));
-    const resdata = await getUserService({
-      userid: authdata.user._id,
-      name: location.state.data.myserver,
-    });
-    const currentBlockData = await currentBlock();
-    const expire =
-      Math.round(
-        (resdata?.filterdata[0]?.currentBlockData - currentBlockData) / 1000
-      ) * 1000;
-
-    console.log(expire, "block");
-    const data = {
-      type: "fluxappupdate",
-      version: 1,
-      appSpecification: {
-        version: 6,
-        name: location.state.data.myserver,
-        description: gameitems[location.state.data.server].title,
-        owner: zelID,
-        compose: [
-          {
-            name: "wickedsensation",
-            description: gameitems[location.state.data.server].title,
-            repotag: "wickedsensation/stoneblock3:1.6.1",
-            ports: [39097, 39098],
-            domains: ["", ""],
-            environmentParameters: [],
-            commands: [],
-            containerPorts: [25565, 22],
-            containerData: "/data/world  s:/data/backups",
-            cpu: 0.2,
-            ram: 200,
-            hdd: 1,
-            tiered: false,
-          },
-        ],
-        instances: 3,
-        contacts: [],
-        geolocation: [],
-        expire: expire,
-      },
-      timestamp: new Date().getTime(),
-    };
-    const signatureinfo =
-      data.type +
-      data.version +
-      JSON.stringify(data.appSpecification) +
-      data.timestamp;
-    const signatureData = getSignature(signatureinfo);
-    console.log(signatureinfo);
-    data.signature = Buffer.from(signatureData).toString("base64");
-    const updatehash = await fetch("https://api.runonflux.io/apps/appupdate", {
-      method: "post",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
       .then((response) => {
-        setUpdatehash(response.data);
+        setTransactiondata(response.data);
         return response.data;
       })
       .catch((err) => console.log(err));
-    const paidaddress = await fetch(
-      `https://api.runonflux.io/apps/deploymentinformation`,
-      {
-        method: "get",
-        headers: {
-          zelidauth: JSON.stringify({
-            zelid: zelID,
-            signature: signature,
-            loginPhrase: logininfo,
-          }),
-        },
-      }
-    )
-      .then((res) => res.json())
-      .then((response) => response.data.address)
-      .catch((err) => console.log(err));
-    const data2 = {
-      version: 6,
-      name: location.state.data.myserver,
-      description: "server",
-      owner: zelID,
-      compose: [
-        {
-          name: "wickedsensation",
-          description: "server",
-          repotag: "wickedsensation/stoneblock3:1.6.1",
-          ports: [39097, 39098],
-          domains: ["", ""],
-          environmentParameters: [],
-          commands: [],
-          containerPorts: [25565, 22],
-          containerData: "/data/world  s:/data/backups",
-          cpu: 0.1,
-          ram: 200,
-          hdd: 1,
-          tiered: false,
-        },
-      ],
-      instances: 3,
-      contacts: [],
-      geolocation: [],
-      expire: 22000,
-    };
-
-    const amount = await fetch(`https://api.runonflux.io/apps/calculateprice`, {
-      method: "post",
-      body: JSON.stringify(data2),
-    })
-      .then((res) => res.json())
-      .then((response) => response.data)
-      .catch((err) => console.log(err));
-
-    const hashdata = await getHash(updatehash, amount, paidaddress);
-
-    await fetch(`https://api.runonflux.io/daemon/sendrawtransaction`, {
-      method: "post",
-      headers: {
-        zelidauth: JSON.stringify({
-          zelid: zelID,
-          signature: signature,
-          loginPhrase: logininfo,
-        }),
-      },
-      body: JSON.stringify({
-        hexstring: hashdata,
-        allowhighfees: false,
-      }),
-    })
-      .then((res) => res.json())
-      .then((response) => setTransactiondata(response.data))
-      .catch((err) => console.log(err));
-    // eslint-disable-next-line no-use-before-define
-    const service = await getServiceApi();
-    console.log(service, "filter");
-
-    const filterdata = service.serviceData.filter(
-      (data) =>
-        data.userid === authdata.user._id &&
-        data.name === location.state.data.myserver
-    );
-    const serviceData = {
-      serverid: filterdata[0]._id,
-      userid: authdata.user._id,
-      name: location.state.data.myserver,
-      currentBlockData: expire + currentBlockData,
-    };
-    await updateUserService(serviceData);
+    if (transaction) {
+      const authdata = JSON.parse(localStorage.getItem("auth"));
+      // eslint-disable-next-line no-use-before-define
+      const currentBlockData = await currentBlock();
+      const serviceData = {
+        userid: authdata.user._id,
+        name: location.state.data.title,
+        currentBlockData: currentBlockData + 22000,
+        servername: `cubehosting${servicenumber}`,
+        port: location.state.data.port,
+      };
+      await serviceApi(serviceData);
+    }
   };
 
   return (
@@ -515,37 +194,27 @@ const ServerInfo = () => {
           </PriceDetailWrapper>
           <PriceDetailWrapper>
             <Row>
-              <BoldTitle>{location.state.data.resources.slider1}</BoldTitle>
+              <BoldTitle>{cpu}</BoldTitle>
               Threads
             </Row>
             <Row>
-              <BoldTitle>
-                {location.state.data.resources.slider2 / 1000}
-              </BoldTitle>{" "}
-              RAM
+              <BoldTitle>{ram}</BoldTitle> RAM
             </Row>
             <Row>
-              <BoldTitle>{location.state.data.resources.slider3}</BoldTitle>{" "}
-              Storage
+              <BoldTitle>{hdd}</BoldTitle> Storage
             </Row>
           </PriceDetailWrapper>
           <PriceDetailWrapper>
             <Row>
-              <BoldTitle>
-                {location.state.data.resources.slider1 * 3.62}
-              </BoldTitle>
+              <BoldTitle>{cpu * 3.62}</BoldTitle>
               Threads Cost USD
             </Row>
             <Row>
-              <BoldTitle>
-                {(location.state.data.resources.slider2 * 0.19) / 1000}
-              </BoldTitle>
+              <BoldTitle>{(ram * 0.19) / 1000}</BoldTitle>
               RAM Cost USD
             </Row>
             <Row>
-              <BoldTitle>
-                {location.state.data.resources.slider3 * 0.1}
-              </BoldTitle>
+              <BoldTitle>{hdd * 0.1}</BoldTitle>
               Storage Cost USD
             </Row>
           </PriceDetailWrapper>
@@ -611,81 +280,6 @@ const ServerInfo = () => {
               onClick={handleButtonClick}
             />
           )}
-        </ButtonWrapper>
-        <ButtonWrapper>
-          <Button
-            text="Start"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleStartClick}
-          />
-          <Button
-            text="Stop"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleStopClick}
-          />
-          <Button
-            text="Restart"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleRestartClick}
-          />
-          <Button
-            text="Reinstall App"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleReinstallClick}
-          />
-
-          <Button
-            text="Clean SSD"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleHardRedeployClick}
-          />
-          <Button
-            text="Move Server"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleRedeployClick}
-          />
-        </ButtonWrapper>
-        <ButtonWrapper>
-          <Button
-            text="Update Server"
-            width="180px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={handleUpdateServer}
-          />
         </ButtonWrapper>
       </PaymentPart>
     </Wrapper>

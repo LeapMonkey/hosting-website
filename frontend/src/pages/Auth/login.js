@@ -65,6 +65,7 @@ const Login = () => {
           bgcolor="linear-gradient(270deg, #06c200, #035c00)"
           onClick={handleClick}
         />
+           <GreenText href="/register">Create account</GreenText>
         <GreenText>Forgot your password</GreenText>
       </Container>
     </Wrapper>

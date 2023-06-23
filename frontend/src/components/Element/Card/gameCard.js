@@ -11,7 +11,7 @@ const GameCard = (props) => {
       </CardContainer>
       <PriceWrapper>
         <Text>From</Text>
-        <Title>{props.price}</Title>
+        <Title>${props.price}</Title>
         <Text>USD per Month</Text>
       </PriceWrapper>
     </Wrapper>

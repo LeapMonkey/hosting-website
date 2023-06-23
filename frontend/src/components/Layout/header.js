@@ -10,8 +10,8 @@ const items = [
     title: "Services",
   },
   {
-    href: "/contact",
-    title: "Contact",
+    href: "/profile",
+    title: "Profile",
   },
   {
     href: "/wiki",

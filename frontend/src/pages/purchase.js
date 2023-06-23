@@ -1,215 +1,99 @@
 import styled from "styled-components";
-import { Column, Row } from "../components/Element";
+import { Column, DefaultImage, Row } from "../components/Element";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { locations } from "../assets/json/location";
+import { Vector } from "../components/Image";
 import Button from "../components/Element/button";
-import SelectSearch from "react-select-search";
-import { gameitems } from "../assets/json/gamedata";
-import { mopacks } from "../assets/json/mopacks";
-import { period } from "../assets/json/period";
 
 const Purchase = () => {
   const location = useLocation();
-  const [sliderValue, setSliderValue] = useState({
-    slider1: 0,
-    slider2: 0,
-    slider3: 0,
-  });
-  const [selectGame, setSelectGame] = useState(location.state.data.id);
-  const [selectModpack, setSelectModpack] = useState();
-  const [selectContinent, setSelectContinent] = useState();
-  const [selectCountry, setSelectCountry] = useState();
-  const [selectState, setSelectState] = useState();
-  const [selectPeriod, setSelectPeriod] = useState();
-  const [inputServer, setInputServer] = useState();
+  const [selectedData, setSelectedData] = useState(location.state.data);
   const navigate = useNavigate();
-  const handleSliderChange = (e) => {
-    setSliderValue({ ...sliderValue, [e.target.name]: e.target.value });
-  };
-  const removeDuplicates = (data, key) => {
-    return [...new Map(data.map((x) => [key(x), x]))];
-  };
-  const handleButtonClick = () => {
-    const data = {
-      server: selectGame,
-      mod: selectModpack,
-      myserver: inputServer,
-      resources: sliderValue,
-    };
+  const handleClick = (data, flag) => {
     navigate("/payment", {
       state: {
         data: data,
+        flag: flag,
       },
     });
   };
-  console.log(removeDuplicates(locations, (it) => it.Continent));
   return (
     <Wrapper>
-      <OrderPart>
-        <SelectPart>
-          <LabelTitle>
-            GAME
-            <SelectSearch
-              options={gameitems.map((item) => ({
-                value: item.id,
-                name: item.title,
-              }))}
-              value={selectGame}
-              onChange={setSelectGame}
-              search
-            />
-          </LabelTitle>
-          <LabelTitle>
-            MOD PACK
-            <SelectSearch
-              options={mopacks.map((item, key) => ({
-                value: key,
-                name: item.modpack,
-              }))}
-              value={selectModpack}
-              onChange={setSelectModpack}
-              search
-            />
-          </LabelTitle>
-        </SelectPart>
-        <LabelTitle>SEVER LOCATION</LabelTitle>
-        <SelectPart>
-          <LabelContent>
-            Continent
-            <SelectSearch
-              options={removeDuplicates(locations, (it) => it.Continent).map(
-                (item, key) => ({
-                  value: key,
-                  name: item[0],
-                })
-              )}
-              value={selectContinent}
-              onChange={setSelectContinent}
-              search
-            />
-          </LabelContent>
-          <LabelContent>
-            Country
-            <SelectSearch
-              options={removeDuplicates(locations, (it) => it.Country).map(
-                (item, key) => ({
-                  value: key,
-                  name: item[0],
-                })
-              )}
-              value={selectCountry}
-              onChange={setSelectCountry}
-              search
-            />
-          </LabelContent>
-          <LabelContent>
-            State/Provinice
-            <SelectSearch
-              options={removeDuplicates(
-                locations,
-                (it) => it["State / Province"]
-              ).map((item, key) => ({
-                value: key,
-                name: item[0],
-              }))}
-              value={selectState}
-              onChange={setSelectState}
-              search
-            />
-          </LabelContent>
-        </SelectPart>
-        <LabelTitle>RESOURCES</LabelTitle>
-
-        <LabelContent2>
-          Threads - {sliderValue.slider1}
-          <LabelSlider>
-            <SliderText>Min -1</SliderText>
-            <SliderText>Max - 14</SliderText>
-          </LabelSlider>
-          <SliderWrapper
-            type="range"
-            min="1"
-            max="14"
-            name="slider1"
-            value={sliderValue.slider1}
-            onChange={handleSliderChange}
-          />
-        </LabelContent2>
-
-        <LabelContent2>
-          RAM - {sliderValue.slider2 / 1000}GB
-          <LabelSlider>
-            <SliderText>Min - 1</SliderText>
-            <SliderText>Max - 56</SliderText>
-          </LabelSlider>
-          <SliderWrapper
-            type="range"
-            min="1000"
-            max="56000"
-            name="slider2"
-            step="100"
-            value={sliderValue.slider2}
-            onChange={handleSliderChange}
-          />
-        </LabelContent2>
-        <LabelContent2>
-          Storage - {sliderValue.slider3}GB
-          <LabelSlider>
-            <SliderText>Min - 5</SliderText>
-            <SliderText>Max - 800</SliderText>
-          </LabelSlider>
-          <SliderWrapper
-            type="range"
-            min="5"
-            max="800"
-            name="slider3"
-            value={sliderValue.slider3}
-            onChange={handleSliderChange}
-          />
-        </LabelContent2>
-        <LabelTitle>
-          LENTAL PERIOD
-          <SelectSearch
-            options={period.map((item) => ({
-              value: item.id,
-              name: item.period,
-            }))}
-            value={selectPeriod}
-            onChange={setSelectPeriod}
-            search
-          />
-        </LabelTitle>
-        <LabelTitle>
-          NAME YOUR SERVER
-          <SelectInput
-            type="text"
-            value={inputServer}
-            onChange={(e) => setInputServer(e.target.value)}
-          />
-        </LabelTitle>
-        <ButtonWrapper>
-          <Button
-            text={`$ ${(
-              sliderValue.slider1 * 3.62 +
-              (sliderValue.slider2 * 0.19) / 1000 +
-              sliderValue.slider3 * 0.1
-            ).toFixed(2)} USD Purchase`}
-            width="150px"
-            fsize="18px"
-            radius="6px"
-            fweight="500"
-            color="black"
-            onClick={handleButtonClick}
-          />
-        </ButtonWrapper>
-        <LabelTitle>
-          RATES
-          <LabelContent>1 CPU thread costs $3.62 USD</LabelContent>
-          <LabelContent>1 GB RAM costs $1.90 USD</LabelContent>
-          <LabelContent>1 Gb storage $.01 USD</LabelContent>
-        </LabelTitle>
-      </OrderPart>
+      {selectedData && (
+        <Banner>
+          <BannerImage src={selectedData.background} />
+          <BannerContainer>
+            <Card>
+              <CardPrice>
+                <PriceTitle>{selectedData.price1} </PriceTitle>
+                <PriceGeneral> / per month</PriceGeneral>
+              </CardPrice>
+              <CardTitle>
+                <CardTitleHeader>Budget</CardTitleHeader>{" "}
+                <>For Beginner Who Want To Scale Business Globally</>
+              </CardTitle>
+              <CardDetail>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>vCore {selectedData.cpu1}</>
+                </CardDetailItem>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>Ram {selectedData.ram1}GB</>
+                </CardDetailItem>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>SSD {selectedData.ssd1}GB</>
+                </CardDetailItem>
+              </CardDetail>
+              <Button
+                text="GET STARTED"
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="black"
+                fsize="16px"
+                padding="15px"
+                onClick={() => handleClick(selectedData, 1)}
+              />
+            </Card>
+            <Card>
+              <CardPrice>
+                <PriceTitle>{selectedData.price2} </PriceTitle>
+                <PriceGeneral> / per month</PriceGeneral>
+              </CardPrice>
+              <CardTitle>
+                <CardTitleHeader>Performance</CardTitleHeader>{" "}
+                <>For Beginner Who Want To Scale Business Globally</>
+              </CardTitle>
+              <CardDetail>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>vCore {selectedData.cpu2}</>
+                </CardDetailItem>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>Ram {selectedData.ram2}GB</>
+                </CardDetailItem>
+                <CardDetailItem>
+                  <DefaultImage src={Vector} />
+                  <>SSD {selectedData.ssd2}GB</>
+                </CardDetailItem>
+              </CardDetail>
+              <Button
+                text="GET STARTED"
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="black"
+                fsize="16px"
+                padding="15px"
+                onClick={() => handleClick(selectedData, 2)}
+              />
+            </Card>
+          </BannerContainer>
+        </Banner>
+      )}
     </Wrapper>
   );
 };
@@ -218,62 +102,70 @@ const Wrapper = styled(Column)`
   background-color: #313131;
   width: 100%;
   color: white;
-  padding: 20px;
+  height: 100vh;
+`;
+const Banner = styled(Column)`
+  width: 100%;
+  position: relative;
+  justify-content: center;
+  align-items: center;
   height: 100%;
 `;
+const BannerImage = styled(DefaultImage)`
+  position: absolute;
+  height: 100%;
+  mask-image: linear-gradient(#fff, transparent);
+  width: 100%;
+  object-position: top;
+  margin-top: 50px;
+  object-fit: cover;
+`;
+const BannerContainer = styled(Row)`
+  height: 100%;
+  gap: 40px;
+  margin-top: 50px;
+`;
 
-const OrderPart = styled(Column)`
-  gap: 20px;
-  margin-top: 100px;
-  max-width: 1000px;
-  align-items: flex-start;
-  width: 100%;
-`;
-const SelectPart = styled(Row)`
-  gap: 20px;
-  @media screen and (max-width: 500px) {
-    flex-direction: column;
-    justify-content: center;
-  }
-`;
-const LabelTitle = styled(Column)`
-  gap: 5px;
-  align-items: flex-start;
-  width: 100%;
-`;
-const LabelContent2 = styled(LabelTitle)`
-  font-size: 15px;
-`;
-const LabelContent = styled(LabelTitle)`
-  font-size: 14px;
-`;
-const SelectInput = styled.input`
-  border-radius: 5px;
-  outline: none;
-  font-size: 16px;
-  padding: 0 40px 0 16px;
-  height: 48px;
-  border: 2px solid #dce0e8;
-  max-width: 300px;
-  width: 100%;
-`;
-const SliderWrapper = styled.input`
-  width: 100%;
-  height: 15px;
-  border-radius: 5px;
-  background: #d3d3d3;
-  outline: none;
+const Card = styled(Column)`
+  padding: 30px 20px;
+  gap: 40px;
+  background: rgb(30, 30, 30);
+  border-radius: 20px;
+  width: 300px;
+  height: 450px;
+  gap: 30px;
+  z-index: 10;
   opacity: 0.7;
-`;
-const SliderText = styled.div`
-  font-size: 12px;
-`;
-const LabelSlider = styled(Row)`
-  justify-content: space-between;
-  width: 100%;
-`;
-const ButtonWrapper = styled(Row)`
+  font-size: 14px;
   justify-content: center;
+`;
+const CardPrice = styled(Row)`
+  gap: 10px;
   width: 100%;
+`;
+const PriceTitle = styled.div`
+  font-weight: 700;
+  font-size: 50px;
+`;
+const PriceGeneral = styled.div`
+  font-weight: 500;
+  font-size: 20px;
+`;
+const CardTitle = styled(Column)`
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+`;
+const CardTitleHeader = styled.div`
+  font-weight: 600;
+  font-size: 20px;
+`;
+const CardDetail = styled(Column)`
+  gap: 20px;
+  width: 100%;
+  align-items: flex-start;
+`;
+const CardDetailItem = styled(Row)`
+  gap: 20px;
 `;
 export default Purchase;

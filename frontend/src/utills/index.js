@@ -11,7 +11,14 @@ export const updateTitanNodeMessage = (message) => {
   }
   return "";
 };
+
 export const getValueHexBuffer = (hex) => {
   const buf = Buffer.from(hex, "hex").reverse();
   return buf.toString("hex");
+};
+
+export const getRandomNumber = () => {
+  let foo = "";
+  for (let i = 0; i < 19; ++i) foo += Math.floor(Math.random() * 10);
+  return foo;
 };

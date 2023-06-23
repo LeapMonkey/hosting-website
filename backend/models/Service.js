@@ -10,6 +10,12 @@ const ServiceSchema = new mongoose.Schema({
   currentBlockData: {
     type: Number,
   },
+  servername: {
+    type: String,
+  },
+  port: {
+    type: Object,
+  },
 });
 
 export default mongoose.model("Service", ServiceSchema);

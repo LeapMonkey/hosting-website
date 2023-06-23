@@ -71,7 +71,7 @@ const Landing = () => {
           <GameCard
             url={items.url}
             title={items.title}
-            price={items.price}
+            price={items.price1}
             key={key}
             box={items.box}
             onClick={() => handleItemClick(items)}

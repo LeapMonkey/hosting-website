@@ -3,10 +3,13 @@ import { Column, Row } from "../components/Element";
 import { useEffect } from "react";
 import { useState } from "react";
 import { getServiceApi } from "../action/action";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const [auth, setAuth] = useState();
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   const [serviceData, setServiceData] = useState();
+  const navigate = useNavigate();
+
   const initialData = async () => {
     const authdata = JSON.parse(localStorage.getItem("auth"));
     setAuth(authdata.user);
@@ -16,31 +19,40 @@ const Profile = () => {
     );
   };
   useEffect(() => {
-    initialData();
+    auth && initialData();
+    console.log(auth, "auth");
+    !auth && alert("please login");
   }, []);
-
+  const handleItemClick = (data) => {
+    navigate("/server", {
+      state: {
+        data: data,
+      },
+    });
+  };
   return (
     <Wrapper>
-      <WrapperContainer>
-        <UserInfoGroup>
-          {auth?.username}
-          <DefaultText>{auth?.email}</DefaultText>
-        </UserInfoGroup>
-        <UserServerGroup>
-          <ColumnData>
-            <DefaultTitle>Servers</DefaultTitle>
-            {serviceData &&
-              serviceData.map((item) => <DefaultText>{item.name}</DefaultText>)}
-          </ColumnData>
-
-          <ColumnData>
-            <DefaultTitle>End Date</DefaultTitle>
-            <DefaultText>9/6/23</DefaultText>
-            <DefaultText>Researching</DefaultText>
-            <DefaultText>Researching</DefaultText>
-          </ColumnData>
-        </UserServerGroup>
-      </WrapperContainer>
+      {auth && (
+        <WrapperContainer>
+          <UserInfoGroup>
+            {auth?.username}
+            <DefaultText>{auth?.email}</DefaultText>
+          </UserInfoGroup>
+          {serviceData &&
+            serviceData.map((item) => (
+              <UserServerGroup onClick={() => handleItemClick(item)}>
+                <ColumnData>
+                  <DefaultTitle>Servers</DefaultTitle>
+                  <DefaultText>{item.name}</DefaultText>
+                </ColumnData>
+                <ColumnData>
+                  <DefaultTitle>End Date</DefaultTitle>
+                  <DefaultText>9/6/23</DefaultText>
+                </ColumnData>
+              </UserServerGroup>
+            ))}
+        </WrapperContainer>
+      )}
     </Wrapper>
   );
 };
@@ -54,10 +66,12 @@ const Wrapper = styled(Column)`
 `;
 const WrapperContainer = styled(Column)`
   gap: 20px;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: flex-start;
   max-width: 900px;
   width: 100%;
+  max-height: 80vh;
+  overflow: auto;
 `;
 const UserInfoGroup = styled(Column)`
   border-radius: 10px;
