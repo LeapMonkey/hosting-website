@@ -15,7 +15,7 @@ const Input = (props) => {
 
 const Wrapper = styled.input`
   outline: none;
-  padding: 10px 15px;
+  padding: 15px 15px;
   width: 100%;
   background: #272727 !important;
   border-radius: 5px !important;

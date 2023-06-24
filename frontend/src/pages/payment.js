@@ -6,12 +6,7 @@ import CoinbaseCommerceButton from "react-coinbase-commerce";
 import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import getHash from "../utills/gethash";
-import {
-  getServiceApi,
-  getUserService,
-  serviceApi,
-  updateUserService,
-} from "../action/action";
+import { getServiceApi, serviceApi } from "../action/action";
 import {
   currentBlock,
   getAmout,
@@ -21,6 +16,7 @@ import {
 import bitcoin from "bitcoinjs-lib";
 import bitcoinMessage from "bitcoinjs-message";
 import { getRandomNumber } from "../utills";
+import { toast } from "react-toastify";
 
 const ServerInfo = () => {
   const location = useLocation();
@@ -45,7 +41,6 @@ const ServerInfo = () => {
     "L3yGy6krc9VywytHCNEQfuMdpKrPzCfqW9knYAqCyGkKFxLnoXCE";
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
-  const [updatehash, setUpdatehash] = useState("");
   const [servicenumber, setServiceNumber] = useState();
   const initialData = async () => {
     getFluxAuth();
@@ -164,6 +159,7 @@ const ServerInfo = () => {
       .then((res) => res.json())
       .then((response) => {
         setTransactiondata(response.data);
+        toast(response.data);
         return response.data;
       })
       .catch((err) => console.log(err));
@@ -226,7 +222,7 @@ const ServerInfo = () => {
         <Paypal cost={total} />
         <CoinbaseCommerceButton
           styled
-          checkoutId="8e24d5a1-d361-44ca-a5e7-fbe1ce9f5202"
+          checkoutId="85489fef-ae89-4643-961b-06be424baff1"
           // chargeId="CWL2LG2J"
           onChargeSuccess={(data) => {
             console.log(data);

@@ -9,7 +9,8 @@ const Paypal = (props) => {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": "test",
+        "client-id":
+          "AU3lEj-LdGgb_mwzfHPBOIkCQxuHw4VNUKoEQCud5nuj6Sw5sjXLhLqOj41Leaafu-pyNLwRvkz1Hf9-",
         components: "buttons",
       }}
     >

@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { Column, Row } from "../components/Element";
-import SelectSearch from "react-select-search";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
@@ -17,13 +16,13 @@ import {
   handleStopClick,
   handleUpdateServer,
 } from "../utills/manager";
+import Input from "../components/Element/input";
 import { getServiceApi, updateUserService } from "../action/action";
 import { toast } from "react-toastify";
+import Button from "../components/Element/button";
 
 const ServerInfo = () => {
   const location = useLocation();
-  const [selectData, setSelectData] = useState(location.state.data.servername);
-  const [period, setPeriod] = useState();
   const [environment, setEnvironment] = useState();
   const [ipData, setIpData] = useState();
   const getIpData = async () => {
@@ -65,7 +64,7 @@ const ServerInfo = () => {
         instances: 3,
         contacts: [],
         geolocation: ["acNA"],
-        expire: expire,
+        expire: expire + 22000,
       },
       timestamp: new Date().getTime(),
     };
@@ -98,6 +97,9 @@ const ServerInfo = () => {
     }
   };
   const updateEnvironmentData = async () => {
+    if (!environment) {
+      return toast.error("Please input Environment");
+    }
     const olddata = await getAppSpecification(location.state.data.servername);
     const expire = await getExpire(location.state.data.servername);
     const currentBlockData = await currentBlock();
@@ -184,60 +186,108 @@ const ServerInfo = () => {
           <ColumnButton>
             <Title> Control</Title>
             <Button
+              text="START"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() => handleStartClick(location.state.data.servername)}
-            >
-              Start
-            </Button>
+            />
             <Button
+              text="STOP"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() => handleStopClick(location.state.data.servername)}
-            >
-              Stop
-            </Button>
+            />
             <Button
+              text="RESTART"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() => handleRestartClick(location.state.data.servername)}
-            >
-              Restart
-            </Button>
+            />
           </ColumnButton>
           <ColumnButton>
             <Title> Deployment Control </Title>
             <Button
+              text="Reinstall"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() =>
                 handleReinstallClick(location.state.data.servername)
               }
-            >
-              Reinstall Files
-            </Button>
+            />
+
             <Button
+              text="Move Server"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() =>
                 handleRedeployClick(location.state.data.servername)
               }
-            >
-              Move Server
-            </Button>
+            />
           </ColumnButton>
           <ColumnButton>
             <Title>Data Control</Title>
-            <Button>Load Backup</Button>
+            {/* <Button>Load Backup</Button> */}
             <Button
+              text=" Clean SSD"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
               onClick={() =>
                 handleHardRedeployClick(location.state.data.servername)
               }
-            >
-              Clean SSD
-            </Button>
+            />
           </ColumnButton>
         </ButtonGroup>
-        <ColumnButton>
-          <Title>General</Title>
-          <Button onClick={updateExpireData}>Extend Rental</Button>
-          <input onChange={(e) => setPeriod(e.target.value)}></input>
-        </ColumnButton>
-        <input
-          placeholder="[]"
-          onChange={(e) => setEnvironment(e.target.value)}
-        ></input>
-        <Button onClick={updateEnvironmentData}>update environment</Button>
+        <Title>Update</Title>
+        <ButtonGroup2>
+          <Button
+            onClick={updateExpireData}
+            text="Extend Rental"
+            width="100%"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+          />
+          <Input
+            placeholder="[`Admin`]"
+            onChange={(e) => setEnvironment(e.target.value)}
+          />
+          <Button
+            text="Update Environment"
+            width="100%"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={updateEnvironmentData}
+          />
+        </ButtonGroup2>
 
         <ApplyMod>
           <Row>Mods</Row>
@@ -258,7 +308,6 @@ const Wrapper = styled(Column)`
   color: white;
   padding: 20px;
   gap: 20px;
-  height: 100vh;
 `;
 const WrapperContainer = styled(Column)`
   gap: 20px;
@@ -281,6 +330,7 @@ const ButtonGroup = styled(Row)`
   gap: 10px;
   align-items: flex-start;
   flex-wrap: wrap;
+  width: 100%;
 `;
 const ButtonGroup2 = styled(ButtonGroup)`
   gap: 10px;
@@ -295,13 +345,5 @@ const ApplyMod = styled(Column)`
   gap: 10px;
   width: 100%;
 `;
-const Button = styled.button`
-  width: 100%;
-  border-radius: 5px;
-  padding: 20px;
-  font-size: 18px;
-  :hover {
-    background-color: #00cfc8;
-  }
-`;
+
 export default ServerInfo;
