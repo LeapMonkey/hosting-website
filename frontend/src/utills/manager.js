@@ -126,7 +126,7 @@ const getAmout = async (cpu, ram, hdd, expire) => {
   const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const data = {
     version: 6,
-    name: `cubehosting`,
+    name: `cubehostings`,
     description: "server",
     owner: zelID,
     compose: [

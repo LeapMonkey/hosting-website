@@ -75,7 +75,7 @@ const ServerInfo = () => {
       version: 1,
       appSpecification: {
         version: 6,
-        name: `cubehosting${servicenumber}`,
+        name: `cubehostings${servicenumber}`,
         description: location.state.data.title,
         owner: zelID,
         compose: [
@@ -171,7 +171,7 @@ const ServerInfo = () => {
         userid: authdata.user._id,
         name: location.state.data.title,
         currentBlockData: currentBlockData + 22000,
-        servername: `cubehosting${servicenumber}`,
+        servername: `cubehostings${servicenumber}`,
         port: location.state.data.port,
       };
       await serviceApi(serviceData);
