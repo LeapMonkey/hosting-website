@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-const ButtonWrapper = ({ currency, showSpinner, cost }) => {
+const ButtonWrapper = ({ currency, showSpinner, cost, setFlag }) => {
   // usePayPalScriptReducer can be use only inside children of PayPalScriptProviders
   // This is the main reason to wrap the PayPalButtons in a new component
   const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
@@ -43,7 +43,13 @@ const ButtonWrapper = ({ currency, showSpinner, cost }) => {
             });
         }}
         onApprove={function (data, actions) {
-          return actions.order.capture().then(function () {});
+          return actions.order.capture().then(function (details) {
+            setFlag(1);
+            const name = details.payer.name.given_name;
+            alert(`Transaction completed by ${name}`);
+            console.log(data);
+            // Your code here after capture the order
+          });
         }}
       />
     </>

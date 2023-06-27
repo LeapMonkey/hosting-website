@@ -103,6 +103,9 @@ const Wrapper = styled(Column)`
   width: 100%;
   color: white;
   height: 100vh;
+  @media screen and (max-width: 640px) {
+    height: 100%;
+  }
 `;
 const Banner = styled(Column)`
   width: 100%;
@@ -124,6 +127,11 @@ const BannerContainer = styled(Row)`
   height: 100%;
   gap: 40px;
   margin-top: 50px;
+  @media screen and (max-width: 640px) {
+    flex-direction: column;
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
 `;
 
 const Card = styled(Column)`
@@ -134,7 +142,7 @@ const Card = styled(Column)`
   width: 300px;
   height: 450px;
   gap: 30px;
-  z-index: 10;
+  z-index: 1;
   opacity: 0.7;
   font-size: 14px;
   justify-content: center;

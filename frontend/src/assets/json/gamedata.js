@@ -30,6 +30,8 @@ export const gameitems = [
     domains: [""],
     environmentParameters: ["EULA=TRUE", "TYPE=FTBA"],
     containerPorts: [25565],
+    checkout1: "7331a4b4-038e-425d-b6b9-8ed2c2f7510c",
+    checkout2: "4e939cbf-af5e-4368-8e33-643a98449159",
   },
   {
     id: 1,
@@ -51,6 +53,8 @@ export const gameitems = [
     domains: [""],
     environmentParameters: ["EULA=TRUE", "TYPE=SPIGOT"],
     containerPorts: [25565],
+    checkout1: "377200ba-49d3-4838-b218-af2ec3216337",
+    checkout2: "4a989922-bd86-4479-813f-14afa1b57cc2",
   },
   {
     id: 2,
@@ -72,6 +76,8 @@ export const gameitems = [
     domains: ["", "", "", ""],
     environmentParameters: ["ADMIN_PASSWORD=root"],
     containerPorts: [7777, 7778, 27020, 27015],
+    checkout1: "f9a24544-b2a8-4ddd-be4b-929e37c80906",
+    checkout2: "98e36d4f-bf4a-438d-9140-bc2372a96488",
   },
   {
     id: 3,
@@ -93,5 +99,7 @@ export const gameitems = [
     domains: ["", ""],
     environmentParameters: [],
     containerPorts: [2456, 2457],
+    checkout1: "d98f357f-d10a-45d2-a534-ceabcd6b3dd9",
+    checkout2: "df0fe168-5312-47fb-999d-37c57d45d35e",
   },
 ];

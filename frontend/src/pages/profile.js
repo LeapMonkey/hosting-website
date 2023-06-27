@@ -102,8 +102,6 @@ const Banner = styled(Column)`
   width: 100%;
   position: relative;
   height: 32vh;
-  align-items: flex-end;
-  justify-content: flex-end;
   img {
     position: absolute;
     height: 100%;
@@ -114,13 +112,18 @@ const Banner = styled(Column)`
 `;
 const BannerContainer = styled(Row)`
   height: 100%;
+  position: relative;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: flex-end;
 `;
 const BannerTitle = styled.h1`
   font-weight: 600;
   color: #fff;
-  text-align: center;
   text-shadow: 2px 2px 1px #191919;
   z-index: 2;
   font-size: 32px;
+  margin-right: 50px;
+  margin-bottom: 50px;
 `;
 export default Profile;

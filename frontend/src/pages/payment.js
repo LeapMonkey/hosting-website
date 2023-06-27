@@ -36,12 +36,17 @@ const ServerInfo = () => {
     location.state.flag === 1
       ? location.state.data.ssd1
       : location.state.data.ssd2;
+  const checkout =
+    location.state.flag === 1
+      ? location.state.data.checkout1
+      : location.state.data.checkout2;
   const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const zelIDPrivatekey =
     "L3yGy6krc9VywytHCNEQfuMdpKrPzCfqW9knYAqCyGkKFxLnoXCE";
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
   const [servicenumber, setServiceNumber] = useState();
+  const [flag, setFlag] = useState();
   const initialData = async () => {
     getFluxAuth();
     const data = await getServiceApi();
@@ -219,64 +224,72 @@ const ServerInfo = () => {
           <Title>Total Cost</Title>
           <BoldTitle>{total}</BoldTitle>
         </CostDetail>
-        <Paypal cost={total} />
-        <CoinbaseCommerceButton
-          styled
-          checkoutId="85489fef-ae89-4643-961b-06be424baff1"
-          // chargeId="CWL2LG2J"
-          onChargeSuccess={(data) => {
-            console.log(data);
-          }}
-          onChargeFailure={(data) => {
-            console.log(data);
-          }}
-          onPaymentDetected={(data) => {
-            console.log(data);
-          }}
-          onModalClosed={() => {
-            console.log("Payment Cancelled");
-          }}
-        />
-        <ButtonWrapper>
-          {registerhash ? (
-            registerhash.message ? (
-              <Column>
+
+        {flag === 1 ? (
+          <ButtonWrapper>
+            {registerhash ? (
+              registerhash.message ? (
+                <Column>
+                  <Button
+                    text="Complete Purchase"
+                    width="180px"
+                    radius="6px"
+                    fweight="500"
+                    color="black"
+                    fsize="16px"
+                    padding="15px"
+                    onClick={handleButtonClick}
+                  />
+                  {registerhash.message}
+                </Column>
+              ) : (
                 <Button
-                  text="Complete Purchase"
-                  width="180px"
+                  text={<>Please check {transactiondata} link</>}
+                  width="100%"
                   radius="6px"
                   fweight="500"
                   color="black"
                   fsize="16px"
                   padding="15px"
-                  onClick={handleButtonClick}
                 />
-                {registerhash.message}
-              </Column>
+              )
             ) : (
               <Button
-                text={<>Please check {transactiondata} link</>}
-                width="100%"
+                text="Complete Purchase"
+                width="180px"
                 radius="6px"
                 fweight="500"
                 color="black"
                 fsize="16px"
                 padding="15px"
+                onClick={handleButtonClick}
               />
-            )
-          ) : (
-            <Button
-              text="Complete Purchase"
-              width="180px"
-              radius="6px"
-              fweight="500"
-              color="black"
-              fsize="16px"
-              padding="15px"
-              onClick={handleButtonClick}
+            )}
+          </ButtonWrapper>
+        ) : (
+          <>
+            <Paypal cost="1" setFlag={setFlag} />
+            <CoinbaseCommerceButton
+              styled
+              checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
+              // checkoutId={checkout}
+              // chargeId="CWL2LG2J"
+              onChargeSuccess={(data) => {
+                console.log(data);
+                setFlag(1);
+              }}
+              onChargeFailure={(data) => {
+                console.log(data);
+              }}
+              onPaymentDetected={(data) => {
+                console.log(data);
+              }}
+              onModalClosed={() => {
+                console.log("Payment Cancelled");
+              }}
             />
-          )}
-        </ButtonWrapper>
+          </>
+        )}
       </PaymentPart>
     </Wrapper>
   );
@@ -287,6 +300,7 @@ const Wrapper = styled(Column)`
   color: white;
   padding: 20px;
   gap: 20px;
+  height: 100vh;
 `;
 const PaymentPart = styled(Column)`
   gap: 30px;

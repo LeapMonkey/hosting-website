@@ -18,6 +18,7 @@ const Paypal = (props) => {
         currency={currency}
         showSpinner={false}
         cost={props.cost}
+        setFlag={props.setFlag}
       />
     </PayPalScriptProvider>
   );
