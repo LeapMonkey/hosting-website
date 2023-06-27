@@ -44,9 +44,9 @@ const ButtonWrapper = ({ currency, showSpinner, cost, setFlag }) => {
         }}
         onApprove={function (data, actions) {
           return actions.order.capture().then(function (details) {
-            setFlag(1);
             const name = details.payer.name.given_name;
             alert(`Transaction completed by ${name}`);
+            setFlag(1);
             console.log(data);
             // Your code here after capture the order
           });

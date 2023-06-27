@@ -10,8 +10,9 @@ const Paypal = (props) => {
     <PayPalScriptProvider
       options={{
         "client-id":
-          "AU3lEj-LdGgb_mwzfHPBOIkCQxuHw4VNUKoEQCud5nuj6Sw5sjXLhLqOj41Leaafu-pyNLwRvkz1Hf9-",
+          "AQmG7pFSUys2ClNaqkhf3IMqWBlpmB2z3eYSbYXdt2P__oUbBmivPommJEmaAVGTDU-K2Ji0k22mGQcY",
         components: "buttons",
+        intent: "capture",
       }}
     >
       <ButtonWrapper
