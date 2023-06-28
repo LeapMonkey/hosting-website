@@ -310,15 +310,19 @@ const ServerInfo = () => {
     }
   };
   useEffect(() => {
-    let text = "ac";
-    if (continent) {
-      text = text + continent;
-    }
-    if (country) {
-      text = text + "_" + country;
-    }
-    if (region) {
-      text = text + "_" + region;
+    let text = "";
+    if (continent !== "ALL") {
+      if (continent) {
+        text = "ac" + text + continent;
+      }
+      if (country) {
+        text = text + "_" + country;
+      }
+      if (region) {
+        text = text + "_" + region;
+      }
+    } else {
+      text = "";
     }
     // country && text =  text+country + "_";
     // region && text = text+ region;
@@ -443,19 +447,27 @@ const ServerInfo = () => {
               isSearchable="true"
               options={continentsOptions("false", possibleLocations)}
               onChange={(e) => {
-                setContinent(e.value);
+                setContinent(e);
+                setCountry("");
+                setRegion("");
               }}
             />
           )}
           {continent ? (
             <Select
+              onChange={(e) => {
+                setCountry(e);
+                setRegion("");
+              }}
               className="basic-single"
               classNamePrefix="select"
               isSearchable="true"
-              options={countriesOptions(continent, "false", possibleLocations)}
-              onChange={(e) => {
-                setCountry(e.value);
-              }}
+              value={[country]}
+              options={countriesOptions(
+                continent.value,
+                "false",
+                possibleLocations
+              )}
             />
           ) : (
             <></>
@@ -465,14 +477,15 @@ const ServerInfo = () => {
               className="basic-single"
               classNamePrefix="select"
               isSearchable="true"
+              value={[region]}
               options={regionsOptions(
-                continent,
-                country,
+                continent.value,
+                country.value,
                 "false",
                 possibleLocations
               )}
               onChange={(e) => {
-                setRegion(e.value);
+                setRegion(e);
               }}
             />
           )}
