@@ -177,7 +177,6 @@ const ServerInfo = () => {
         name: location.state.data.title,
         currentBlockData: currentBlockData + 22000,
         servername: `cubehosting${servicenumber}`,
-        port: location.state.data.port,
       };
       await serviceApi(serviceData);
     }

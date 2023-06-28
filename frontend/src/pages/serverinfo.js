@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 import {
   currentBlock,
   getAppSpecification,
+  getbenchmarks,
   getExpire,
   getFluxAuth,
   getIpaddress,
@@ -20,12 +21,12 @@ import Input from "../components/Element/input";
 import { getServiceApi, updateUserService } from "../action/action";
 import { toast } from "react-toastify";
 import Button from "../components/Element/button";
+import Select from "react-select";
 import {
   continentsOptions,
   countriesOptions,
   regionsOptions,
 } from "../utills/getlocation";
-import Select from "react-select";
 
 const ServerInfo = () => {
   const location = useLocation();
@@ -37,13 +38,15 @@ const ServerInfo = () => {
   const [region, setRegion] = useState();
   const [geolocationData, setGeolocationData] = useState();
   const getIpData = async () => {
-    const ipdata = await getIpaddress(location.state.data.servername);
+    const ipdata = await getbenchmarks(location.state.data.name);
+    console.log(ipdata, "sdf");
+    console.log(ipdata.ipaddress);
     setIpData(ipdata);
   };
   const updateExpireData = async () => {
-    const olddata = await getAppSpecification(location.state.data.servername);
+    const olddata = await getAppSpecification(location.state.data.name);
     console.log(olddata);
-    const expire = await getExpire(location.state.data.servername);
+    const expire = await getExpire(location.state.data.name);
     console.log(expire, "expire");
     const currentBlockData = await currentBlock();
     const authdata = JSON.parse(localStorage.getItem("auth"));
@@ -91,15 +94,14 @@ const ServerInfo = () => {
       const filterdata = service.serviceData.filter(
         (data) =>
           data.userid === authdata.user._id &&
-          data.servername === location.state.data.servername
+          data.servername === location.state.data.name
       );
       const serviceData = {
         serverid: filterdata[0]._id,
         userid: authdata.user._id,
-        name: location.state.data.title,
+        name: location.state.data.description,
         currentBlockData: expire + currentBlockData,
-        servername: location.state.data.servername,
-        port: location.state.data.port,
+        servername: location.state.data.name,
       };
 
       await updateUserService(serviceData).then((res) =>
@@ -111,8 +113,8 @@ const ServerInfo = () => {
     if (!environment) {
       return toast.error("Please input Environment");
     }
-    const olddata = await getAppSpecification(location.state.data.servername);
-    const expire = await getExpire(location.state.data.servername);
+    const olddata = await getAppSpecification(location.state.data.name);
+    const expire = await getExpire(location.state.data.name);
     const currentBlockData = await currentBlock();
     const authdata = JSON.parse(localStorage.getItem("auth"));
     const data = {
@@ -159,15 +161,14 @@ const ServerInfo = () => {
       const filterdata = service.serviceData.filter(
         (data) =>
           data.userid === authdata.user._id &&
-          data.servername === location.state.data.servername
+          data.servername === location.state.data.name
       );
       const serviceData = {
         serverid: filterdata[0]._id,
         userid: authdata.user._id,
-        name: location.state.data.title,
+        name: location.state.data.description,
         currentBlockData: expire + currentBlockData,
-        servername: location.state.data.servername,
-        port: location.state.data.port,
+        servername: location.state.data.name,
       };
 
       await updateUserService(serviceData).then((res) =>
@@ -179,8 +180,8 @@ const ServerInfo = () => {
     if (!geolocationData) {
       return toast.error("Please fill out geolocation Data");
     }
-    const olddata = await getAppSpecification(location.state.data.servername);
-    const expire = await getExpire(location.state.data.servername);
+    const olddata = await getAppSpecification(location.state.data.name);
+    const expire = await getExpire(location.state.data.name);
     const currentBlockData = await currentBlock();
     const authdata = JSON.parse(localStorage.getItem("auth"));
     const data = {
@@ -227,15 +228,14 @@ const ServerInfo = () => {
       const filterdata = service.serviceData.filter(
         (data) =>
           data.userid === authdata.user._id &&
-          data.servername === location.state.data.servername
+          data.servername === location.state.data.name
       );
       const serviceData = {
         serverid: filterdata[0]._id,
         userid: authdata.user._id,
-        name: location.state.data.title,
+        name: location.state.data.description,
         currentBlockData: expire + currentBlockData,
-        servername: location.state.data.servername,
-        port: location.state.data.port,
+        servername: location.state.data.name,
       };
 
       await updateUserService(serviceData).then((res) =>
@@ -335,13 +335,16 @@ const ServerInfo = () => {
       <WrapperContainer>
         <ServerInfoPart>
           <Title>Server Information</Title>
-          <Row>name - {location.state.data.name}</Row>
-          {ipData?.map((item, key) => (
+          <Row>name - {location.state.data.description}</Row>
+          {/* {ipData?.map((item, key) => (
             <Row key={key}>
-              IPv4 - {item.ip.split(":")[0]} - PORT -{" "}
-              {location.state.data?.port}
+              IPv4 - {item.ip.split(":")[0]}
+               - PORT -{" "}
+              {location.state.data.components[0].ports}
             </Row>
-          ))}
+          ))} */}
+          <Row>IPv4 - {ipData?.ipaddress}</Row>
+          <Row>Port - {location.state.data.components[0].ports}</Row>
         </ServerInfoPart>
         <ButtonGroup>
           <ColumnButton>
@@ -354,7 +357,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() => handleStartClick(location.state.data.servername)}
+              onClick={() => handleStartClick(location.state.data.name)}
             />
             <Button
               text="STOP"
@@ -364,7 +367,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() => handleStopClick(location.state.data.servername)}
+              onClick={() => handleStopClick(location.state.data.name)}
             />
             <Button
               text="RESTART"
@@ -374,7 +377,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() => handleRestartClick(location.state.data.servername)}
+              onClick={() => handleRestartClick(location.state.data.name)}
             />
           </ColumnButton>
           <ColumnButton>
@@ -387,9 +390,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() =>
-                handleReinstallClick(location.state.data.servername)
-              }
+              onClick={() => handleReinstallClick(location.state.data.name)}
             />
 
             <Button
@@ -400,9 +401,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() =>
-                handleRedeployClick(location.state.data.servername)
-              }
+              onClick={() => handleRedeployClick(location.state.data.name)}
             />
           </ColumnButton>
           <ColumnButton>
@@ -416,9 +415,7 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={() =>
-                handleHardRedeployClick(location.state.data.servername)
-              }
+              onClick={() => handleHardRedeployClick(location.state.data.name)}
             />
           </ColumnButton>
         </ButtonGroup>

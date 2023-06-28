@@ -66,5 +66,19 @@ const regionsOptions = (
     });
   return regions;
 };
-
-export { continentsOptions, countriesOptions, regionsOptions };
+const getLocation = (geo) => {
+  const specifiedLocation = geo.slice(2);
+  const locations = specifiedLocation.split("_");
+  const continentCode = locations[0];
+  const countryCode = locations[1];
+  const regionName = locations[2];
+  const continentExists = allcontinents.find(
+    (continent) => continent.code === continentCode
+  ) || { name: "ALL" };
+  const countryExists = allcountries.find(
+    (country) => country.code === countryCode
+  ) || { name: "ALL" };
+  console.log(continentExists, countryExists, regionName);
+  return continentExists.name + " " + countryExists.name + " " + regionName;
+};
+export { continentsOptions, countriesOptions, regionsOptions, getLocation };

@@ -122,6 +122,15 @@ const getIpaddress = async (servername) => {
     .then((response) => response.data)
     .catch((err) => console.log(err));
 };
+
+const getbenchmarks = async () => {
+  return await fetch(`https://api.runonflux.io/benchmark/getbenchmarks`, {
+    method: "get",
+  })
+    .then((res) => res.json())
+    .then((response) => response.data)
+    .catch((err) => console.log(err));
+};
 const getAmout = async (cpu, ram, hdd, expire) => {
   const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const data = {
@@ -254,6 +263,20 @@ const getAppSpecification = async (server) => {
     .then((response) => response.data)
     .catch((err) => console.log(err));
 };
+
+const getFluxAllUserData = async () => {
+  const Fluxauth = JSON.parse(localStorage.getItem("fluxauth"));
+  return await fetch(
+    `https://jetpackbridge.runonflux.io/api/v1/dapps.php?filter=&zelid=${
+      Fluxauth.zelid
+    }&signature=${Buffer.from(Fluxauth.signature).toString(
+      "base64"
+    )}&loginPhrase=${Fluxauth.loginPhrase}`
+  )
+    .then((res) => res.json())
+    .catch((err) => console.log(err));
+};
+
 export {
   handleStartClick,
   handleRestartClick,
@@ -270,4 +293,6 @@ export {
   handleUpdateServer,
   getAppSpecification,
   getExpire,
+  getFluxAllUserData,
+  getbenchmarks,
 };

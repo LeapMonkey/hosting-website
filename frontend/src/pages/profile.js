@@ -5,6 +5,8 @@ import { useState } from "react";
 import { getServiceApi } from "../action/action";
 import { useNavigate } from "react-router-dom";
 import { ARK } from "../components/Image";
+import { getFluxAllUserData, getFluxAuth } from "../utills/manager";
+import { getLocation } from "../utills/getlocation";
 
 const Profile = () => {
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
@@ -15,14 +17,24 @@ const Profile = () => {
     const authdata = JSON.parse(localStorage.getItem("auth"));
     setAuth(authdata.user);
     const response = await getServiceApi();
-    setServiceData(
-      response.serviceData.filter((item) => item.userid === authdata.user._id)
+    const fluxalluser = await getFluxAllUserData();
+    const service = response.serviceData.filter(
+      (item) => item.userid === authdata.user._id
     );
+    const fluxuserdata = fluxalluser?.filter((flux) =>
+      service?.some((item) => flux.name === item.servername)
+    );
+    console.log(fluxuserdata);
+    setServiceData(fluxuserdata);
   };
+
   useEffect(() => {
-    auth && initialData();
-    console.log(auth, "auth");
-    !auth && alert("please login");
+    if (auth) {
+      initialData();
+      getFluxAuth();
+    } else {
+      alert("please login");
+    }
   }, []);
   const handleItemClick = (data) => {
     navigate("/server", {
@@ -31,6 +43,7 @@ const Profile = () => {
       },
     });
   };
+
   return (
     <Wrapper>
       {auth && (
@@ -51,7 +64,13 @@ const Profile = () => {
                   </ColumnData>
                   <ColumnData>
                     <DefaultTitle>End Date</DefaultTitle>
-                    <DefaultText>9/6/23</DefaultText>
+                    <DefaultText>{item.expires_date}</DefaultText>
+                  </ColumnData>
+                  <ColumnData>
+                    <DefaultTitle>Location</DefaultTitle>
+                    <DefaultText>
+                      {getLocation(item.geolocation[0])}
+                    </DefaultText>
                   </ColumnData>
                 </UserServerGroup>
               ))}
