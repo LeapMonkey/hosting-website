@@ -20,11 +20,22 @@ import Input from "../components/Element/input";
 import { getServiceApi, updateUserService } from "../action/action";
 import { toast } from "react-toastify";
 import Button from "../components/Element/button";
+import {
+  continentsOptions,
+  countriesOptions,
+  regionsOptions,
+} from "../utills/getlocation";
+import Select from "react-select";
 
 const ServerInfo = () => {
   const location = useLocation();
   const [environment, setEnvironment] = useState();
   const [ipData, setIpData] = useState();
+  const [possibleLocations, setPossibleLocations] = useState();
+  const [continent, setContinent] = useState();
+  const [country, setCountry] = useState();
+  const [region, setRegion] = useState();
+  const [geolocationData, setGeolocationData] = useState();
   const getIpData = async () => {
     const ipdata = await getIpaddress(location.state.data.servername);
     setIpData(ipdata);
@@ -164,11 +175,157 @@ const ServerInfo = () => {
       );
     }
   };
+  const updateGeolocationData = async () => {
+    if (!geolocationData) {
+      return toast.error("Please fill out geolocation Data");
+    }
+    const olddata = await getAppSpecification(location.state.data.servername);
+    const expire = await getExpire(location.state.data.servername);
+    const currentBlockData = await currentBlock();
+    const authdata = JSON.parse(localStorage.getItem("auth"));
+    const data = {
+      type: "fluxappupdate",
+      version: 1,
+      appSpecification: {
+        version: 6,
+        name: olddata.name,
+        description: olddata.description,
+        owner: olddata.owner,
+        compose: [
+          {
+            name: olddata.compose[0].name,
+            description: olddata.compose[0].description,
+            repotag: olddata.compose[0].repotag,
+            ports: olddata.compose[0].ports,
+            domains: olddata.compose[0].domains,
+            environmentParameters: olddata.compose[0].environmentParameters,
+            commands: [],
+            containerPorts: olddata.compose[0].containerPorts,
+            containerData: olddata.compose[0].containerData,
+            cpu: 0.2,
+            ram: 200,
+            hdd: 1,
+            tiered: false,
+          },
+        ],
+        instances: 3,
+        contacts: [],
+        geolocation: geolocationData,
+        expire: expire,
+      },
+      timestamp: new Date().getTime(),
+    };
+    console.log(data);
+
+    const transaction = await handleUpdateServer(data);
+    toast.success(transaction);
+    console.log(transaction, "transaction");
+    if (transaction) {
+      const service = await getServiceApi();
+      console.log(service, "filter");
+
+      const filterdata = service.serviceData.filter(
+        (data) =>
+          data.userid === authdata.user._id &&
+          data.servername === location.state.data.servername
+      );
+      const serviceData = {
+        serverid: filterdata[0]._id,
+        userid: authdata.user._id,
+        name: location.state.data.title,
+        currentBlockData: expire + currentBlockData,
+        servername: location.state.data.servername,
+        port: location.state.data.port,
+      };
+
+      await updateUserService(serviceData).then((res) =>
+        toast.success("Updated")
+      );
+    }
+  };
   useEffect(() => {
     getFluxAuth();
     getIpData();
+    getPossibleLocation();
   }, []);
 
+  const getPossibleLocation = async () => {
+    let possibleLocations = [];
+
+    const response = await fetch(
+      "https://stats.runonflux.io/fluxinfo?projection=geolocation"
+    ).then((res) => res.json());
+
+    if (response.status === "success") {
+      const geoData = response.data;
+      if (geoData.length > 5000) {
+        // all went well
+        geoData.forEach((flux) => {
+          if (
+            flux.geolocation &&
+            flux.geolocation.continentCode &&
+            flux.geolocation.regionName &&
+            flux.geolocation.countryCode
+          ) {
+            const continentLocation = flux.geolocation.continentCode;
+            const countryLocation = `${continentLocation}_${flux.geolocation.countryCode}`;
+            const regionLocation = `${countryLocation}_${flux.geolocation.regionName}`;
+            const continentLocationExists = possibleLocations.find(
+              (location) => location.value === continentLocation
+            );
+            if (continentLocationExists) {
+              continentLocationExists.instances += 1;
+            } else {
+              possibleLocations.push({
+                value: continentLocation,
+                instances: 1,
+              });
+            }
+            const countryLocationExists = possibleLocations.find(
+              (location) => location.value === countryLocation
+            );
+            if (countryLocationExists) {
+              countryLocationExists.instances += 1;
+            } else {
+              possibleLocations.push({
+                value: countryLocation,
+                instances: 1,
+              });
+            }
+            const regionLocationExists = possibleLocations.find(
+              (location) => location.value === regionLocation
+            );
+            if (regionLocationExists) {
+              regionLocationExists.instances += 1;
+            } else {
+              possibleLocations.push({
+                value: regionLocation,
+                instances: 1,
+              });
+            }
+          }
+        });
+        setPossibleLocations(possibleLocations);
+      }
+    }
+  };
+  useEffect(() => {
+    let text = "ac";
+    if (continent) {
+      text = text + continent;
+    }
+    if (country) {
+      text = text + "_" + country;
+    }
+    if (region) {
+      text = text + "_" + region;
+    }
+    // country && text =  text+country + "_";
+    // region && text = text+ region;
+    setGeolocationData([text]);
+  }, [continent, country, region]);
+
+  console.log(geolocationData);
   return (
     <Wrapper>
       <WrapperContainer>
@@ -263,16 +420,6 @@ const ServerInfo = () => {
         </ButtonGroup>
         <Title>Update</Title>
         <ButtonGroup2>
-          <Button
-            onClick={updateExpireData}
-            text="Extend Rental"
-            width="100%"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-          />
           <Input
             placeholder="[`Admin`]"
             onChange={(e) => setEnvironment(e.target.value)}
@@ -286,6 +433,70 @@ const ServerInfo = () => {
             fsize="16px"
             padding="15px"
             onClick={updateEnvironmentData}
+          />
+        </ButtonGroup2>
+        <ButtonGroup2>
+          {possibleLocations && (
+            <Select
+              className="basic-single"
+              classNamePrefix="select"
+              isSearchable="true"
+              options={continentsOptions("false", possibleLocations)}
+              onChange={(e) => {
+                setContinent(e.value);
+              }}
+            />
+          )}
+          {continent ? (
+            <Select
+              className="basic-single"
+              classNamePrefix="select"
+              isSearchable="true"
+              options={countriesOptions(continent, "false", possibleLocations)}
+              onChange={(e) => {
+                setCountry(e.value);
+              }}
+            />
+          ) : (
+            <></>
+          )}
+          {continent && country && (
+            <Select
+              className="basic-single"
+              classNamePrefix="select"
+              isSearchable="true"
+              options={regionsOptions(
+                continent,
+                country,
+                "false",
+                possibleLocations
+              )}
+              onChange={(e) => {
+                setRegion(e.value);
+              }}
+            />
+          )}
+        </ButtonGroup2>
+        <ButtonGroup2>
+          <Button
+            text="Update Geolocation"
+            width="100%"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={updateGeolocationData}
+          />
+          <Button
+            onClick={updateExpireData}
+            text="Extend Rental"
+            width="100%"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
           />
         </ButtonGroup2>
 

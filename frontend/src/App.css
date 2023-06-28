@@ -20,8 +20,10 @@ button {
 	outline: none;
   border: none;
 }
-.select-search-container {
-	width: 100% !important ;
-	max-width: 300px;
+.basic-single  {
+	color: black;
+	width: 100%;
+	font-size: 16px;
+	line-height: 37px;
 }
 

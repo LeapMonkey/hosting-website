@@ -3,7 +3,6 @@ import "./App.css";
 import Router from "./router";
 import { ToastContainer } from "react-toastify";
 import "react-coinbase-commerce/dist/coinbase-commerce-button.css";
-import "react-select-search/style.css";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
