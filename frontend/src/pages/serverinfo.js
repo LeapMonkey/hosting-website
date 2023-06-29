@@ -100,7 +100,7 @@ const ServerInfo = () => {
         serverid: filterdata[0]._id,
         userid: authdata.user._id,
         name: location.state.data.description,
-        currentBlockData: expire + currentBlockData,
+        currentBlockData: expire + currentBlockData + 22000,
         servername: location.state.data.name,
       };
 
