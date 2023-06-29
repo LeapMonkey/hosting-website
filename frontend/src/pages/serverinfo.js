@@ -180,6 +180,7 @@ const ServerInfo = () => {
     if (!geolocationData) {
       return toast.error("Please fill out geolocation Data");
     }
+    console.log(geolocationData);
     const olddata = await getAppSpecification(location.state.data.name);
     const expire = await getExpire(location.state.data.name);
     const currentBlockData = await currentBlock();
@@ -313,20 +314,20 @@ const ServerInfo = () => {
     let text = "";
     if (continent !== "ALL") {
       if (continent) {
-        text = "ac" + text + continent;
+        text = "ac" + text + continent.value;
       }
       if (country) {
-        text = text + "_" + country;
+        text = text + "_" + country.value;
       }
       if (region) {
-        text = text + "_" + region;
+        text = text + "_" + region.value;
       }
     } else {
       text = "";
     }
     // country && text =  text+country + "_";
     // region && text = text+ region;
-    setGeolocationData([text]);
+    setGeolocationData([text], "Adsf");
   }, [continent, country, region]);
 
   console.log(geolocationData);
@@ -488,16 +489,18 @@ const ServerInfo = () => {
           )}
         </ButtonGroup2>
         <ButtonGroup2>
-          <Button
-            text="Update Geolocation"
-            width="100%"
-            radius="6px"
-            fweight="500"
-            color="black"
-            fsize="16px"
-            padding="15px"
-            onClick={updateGeolocationData}
-          />
+          {possibleLocations && (
+            <Button
+              text="Update Geolocation"
+              width="100%"
+              radius="6px"
+              fweight="500"
+              color="black"
+              fsize="16px"
+              padding="15px"
+              onClick={updateGeolocationData}
+            />
+          )}
           <Button
             onClick={updateExpireData}
             text="Extend Rental"
