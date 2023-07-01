@@ -75,7 +75,7 @@ const ServerInfo = () => {
   // };
 
   const handleButtonClick = async () => {
-    const randomservice = Math.floor(Math.random() * 100000000000000000000 + 1);
+    const randomservice = Math.floor(Math.random() * 10000000 + 1);
     const data = {
       type: "fluxappregister",
       version: 1,
