@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { Column, Row } from "../components/Element";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import CoinbaseCommerceButton from "react-coinbase-commerce";
 import {
   currentBlock,
   getAppSpecification,
@@ -21,98 +22,120 @@ import Input from "../components/Element/input";
 import { getServiceApi, updateUserService } from "../action/action";
 import { toast } from "react-toastify";
 import Button from "../components/Element/button";
-import Select from "react-select";
+import Select, { createFilter } from "react-select";
 import {
   continentsOptions,
   countriesOptions,
   regionsOptions,
 } from "../utills/getlocation";
+import Paypal from "../components/Paypal";
+import { gameitems } from "../assets/json/gamedata";
 
 const ServerInfo = () => {
   const location = useLocation();
   const [environment, setEnvironment] = useState();
+  const [servername, setServername] = useState();
   const [ipData, setIpData] = useState();
   const [possibleLocations, setPossibleLocations] = useState();
   const [continent, setContinent] = useState();
   const [country, setCountry] = useState();
   const [region, setRegion] = useState();
   const [geolocationData, setGeolocationData] = useState();
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [timer, setTimer] = useState(null);
+  const [flag, setFlag] = useState(0);
+  const [clickCheck, setClickCheck] = useState(false);
+  const [priceData, setPriceData] = useState();
+  console.log(isButtonDisabled, "isButtonDisabled");
   const getIpData = async () => {
-    const ipdata = await getbenchmarks(location.state.data.name);
-    console.log(ipdata, "sdf");
-    console.log(ipdata.ipaddress);
+    const ipdata = await getIpaddress(location.state.data.name);
     setIpData(ipdata);
   };
+
   const updateExpireData = async () => {
-    const olddata = await getAppSpecification(location.state.data.name);
-    console.log(olddata);
-    const expire = await getExpire(location.state.data.name);
-    console.log(expire, "expire");
-    const currentBlockData = await currentBlock();
-    const authdata = JSON.parse(localStorage.getItem("auth"));
-    const data = {
-      type: "fluxappupdate",
-      version: 1,
-      appSpecification: {
-        version: 6,
-        name: olddata.name,
-        description: olddata.description,
-        owner: olddata.owner,
-        compose: [
-          {
-            name: olddata.compose[0].name,
-            description: olddata.compose[0].description,
-            repotag: olddata.compose[0].repotag,
-            ports: olddata.compose[0].ports,
-            domains: olddata.compose[0].domains,
-            environmentParameters: olddata.compose[0].environmentParameters,
-            commands: [],
-            containerPorts: olddata.compose[0].containerPorts,
-            containerData: olddata.compose[0].containerData,
-            cpu: 0.2,
-            ram: 200,
-            hdd: 1,
-            tiered: false,
-          },
-        ],
-        instances: 3,
-        contacts: [],
-        geolocation: ["acNA"],
-        expire: expire + 22000,
-      },
-      timestamp: new Date().getTime(),
-    };
-    console.log(data, "updated data");
-
-    const transaction = await handleUpdateServer(data);
-    toast.success(transaction);
-    console.log(transaction, "transaction");
-    if (transaction) {
-      const service = await getServiceApi();
-      console.log(service, "filter");
-
-      const filterdata = service.serviceData.filter(
-        (data) =>
-          data.userid === authdata.user._id &&
-          data.servername === location.state.data.name
-      );
-      const serviceData = {
-        serverid: filterdata[0]._id,
-        userid: authdata.user._id,
-        name: location.state.data.description,
-        currentBlockData: expire + currentBlockData + 22000,
-        servername: location.state.data.name,
+    if (flag === 1) {
+      setClickCheck(false);
+      setIsButtonDisabled(true);
+      const olddata = await getAppSpecification(location.state.data.name);
+      console.log(olddata);
+      const expire = await getExpire(location.state.data.name);
+      console.log(expire, "expire");
+      const currentBlockData = await currentBlock();
+      const authdata = JSON.parse(localStorage.getItem("auth"));
+      const data = {
+        type: "fluxappupdate",
+        version: 1,
+        appSpecification: {
+          version: 6,
+          name: olddata.name,
+          description: olddata.description,
+          owner: olddata.owner,
+          compose: [
+            {
+              name: olddata.compose[0].name,
+              description: olddata.compose[0].description,
+              repotag: olddata.compose[0].repotag,
+              ports: olddata.compose[0].ports,
+              domains: olddata.compose[0].domains,
+              environmentParameters: olddata.compose[0].environmentParameters,
+              commands: [],
+              containerPorts: olddata.compose[0].containerPorts,
+              containerData: olddata.compose[0].containerData,
+              cpu: 0.2,
+              ram: 200,
+              hdd: 1,
+              tiered: false,
+            },
+          ],
+          instances: 3,
+          contacts: [],
+          geolocation: ["acNA"],
+          expire: expire + 22000,
+        },
+        timestamp: new Date().getTime(),
       };
+      console.log(data, "updated data");
 
-      await updateUserService(serviceData).then((res) =>
-        toast.success("Updated")
-      );
+      const transaction = await handleUpdateServer(data);
+      toast.success(transaction);
+      console.log(transaction, "transaction");
+      if (transaction) {
+        const service = await getServiceApi();
+        console.log(service, "filter");
+
+        const filterdata = service.serviceData.filter(
+          (data) =>
+            data.userid === authdata.user._id &&
+            data.servername === location.state.data.name
+        );
+        const serviceData = {
+          _id: filterdata[0]._id,
+          userid: authdata.user._id,
+          name: location.state.data.description,
+          currentBlockData: expire + currentBlockData + 22000,
+          servername: location.state.data.name,
+        };
+
+        await updateUserService(serviceData).then((res) =>
+          toast.success("Updated")
+        );
+        // Start the timer
+        const timerId = setTimeout(() => {
+          setIsButtonDisabled(false);
+        }, 10000);
+        setTimer(timerId);
+      }
+    } else {
+      toast.error("Please try with payment");
+      setClickCheck(true);
     }
   };
+  console.log(location.state.data);
   const updateEnvironmentData = async () => {
     if (!environment) {
       return toast.error("Please input Environment");
     }
+    setIsButtonDisabled(true);
     const olddata = await getAppSpecification(location.state.data.name);
     const expire = await getExpire(location.state.data.name);
     const currentBlockData = await currentBlock();
@@ -164,7 +187,7 @@ const ServerInfo = () => {
           data.servername === location.state.data.name
       );
       const serviceData = {
-        serverid: filterdata[0]._id,
+        _id: filterdata[0]._id,
         userid: authdata.user._id,
         name: location.state.data.description,
         currentBlockData: expire + currentBlockData,
@@ -174,12 +197,20 @@ const ServerInfo = () => {
       await updateUserService(serviceData).then((res) =>
         toast.success("Updated")
       );
+      setFlag(0);
+      // Start the timer
+      const timerId = setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 10000);
+      setTimer(timerId);
     }
   };
+
   const updateGeolocationData = async () => {
     if (!geolocationData) {
       return toast.error("Please fill out geolocation Data");
     }
+    setIsButtonDisabled(true);
     console.log(geolocationData);
     const olddata = await getAppSpecification(location.state.data.name);
     const expire = await getExpire(location.state.data.name);
@@ -232,7 +263,7 @@ const ServerInfo = () => {
           data.servername === location.state.data.name
       );
       const serviceData = {
-        serverid: filterdata[0]._id,
+        _id: filterdata[0]._id,
         userid: authdata.user._id,
         name: location.state.data.description,
         currentBlockData: expire + currentBlockData,
@@ -240,14 +271,49 @@ const ServerInfo = () => {
       };
 
       await updateUserService(serviceData).then((res) =>
-        toast.success("Updated")
+        toast.success("GeoLocation Updated")
       );
+      // Start the timer
+      const timerId = setTimeout(() => {
+        setIsButtonDisabled(false);
+      }, 10000);
+      setTimer(timerId);
     }
   };
+
+  const updateServerName = async () => {
+    const authdata = JSON.parse(localStorage.getItem("auth"));
+    const service = await getServiceApi();
+    console.log(service, "filter");
+
+    const filterdata = service.serviceData.filter(
+      (data) =>
+        data.userid === authdata.user._id &&
+        data.servername === location.state.data.name
+    );
+    console.log(filterdata[0]._id);
+    const serviceData = {
+      _id: filterdata[0]._id,
+      changedname: servername,
+    };
+
+    await updateUserService(serviceData).then((res) =>
+      toast.success("Server Name Updated")
+    );
+  };
+
   useEffect(() => {
     getFluxAuth();
     getIpData();
     getPossibleLocation();
+    const pricedata = gameitems.filter(
+      (item) => item.title === location.state.data.description
+    );
+    const suitabledata =
+      pricedata[0].cpu1 === location.state.data.components[0].cpu
+        ? pricedata[0].price1
+        : pricedata[0].price2;
+    setPriceData(suitabledata);
   }, []);
 
   const getPossibleLocation = async () => {
@@ -331,20 +397,26 @@ const ServerInfo = () => {
   }, [continent, country, region]);
 
   console.log(geolocationData);
+  useEffect(() => {
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [timer]);
   return (
     <Wrapper>
       <WrapperContainer>
         <ServerInfoPart>
           <Title>Server Information</Title>
-          <Row>name - {location.state.data.description}</Row>
+          <Row>Server Name - {location.state.data.name}</Row>
+          <Row>Description - {location.state.data.description}</Row>
+          IPv4 - {ipData && ipData[0].ip.split(":")[0]}
           {/* {ipData?.map((item, key) => (
             <Row key={key}>
-              IPv4 - {item.ip.split(":")[0]}
                - PORT -{" "}
               {location.state.data.components[0].ports}
             </Row>
           ))} */}
-          <Row>IPv4 - {ipData?.ipaddress}</Row>
+          {/* <Row>IPv4 - {ipData?.ipaddress}</Row> */}
           <Row>Port - {location.state.data.components[0].ports}</Row>
         </ServerInfoPart>
         <ButtonGroup>
@@ -423,6 +495,22 @@ const ServerInfo = () => {
         <Title>Update</Title>
         <ButtonGroup2>
           <Input
+            placeholder=""
+            onChange={(e) => setServername(e.target.value)}
+          />
+          <Button
+            text="Update Server name"
+            width="100%"
+            radius="6px"
+            fweight="500"
+            color="black"
+            fsize="16px"
+            padding="15px"
+            onClick={updateServerName}
+          />
+        </ButtonGroup2>
+        <ButtonGroup2>
+          <Input
             placeholder="[`Admin`]"
             onChange={(e) => setEnvironment(e.target.value)}
           />
@@ -434,7 +522,8 @@ const ServerInfo = () => {
             color="black"
             fsize="16px"
             padding="15px"
-            onClick={updateEnvironmentData}
+            onClick={!isButtonDisabled ? updateEnvironmentData : undefined}
+            bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
           />
         </ButtonGroup2>
         <ButtonGroup2>
@@ -498,11 +587,13 @@ const ServerInfo = () => {
               color="black"
               fsize="16px"
               padding="15px"
-              onClick={updateGeolocationData}
+              onClick={!isButtonDisabled ? updateGeolocationData : undefined}
+              bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
             />
           )}
           <Button
-            onClick={updateExpireData}
+            onClick={!isButtonDisabled ? updateExpireData : undefined}
+            bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
             text="Extend Rental"
             width="100%"
             radius="6px"
@@ -512,6 +603,30 @@ const ServerInfo = () => {
             padding="15px"
           />
         </ButtonGroup2>
+        {clickCheck && (
+          <>
+            <Paypal cost="1" setFlag={setFlag} />
+            <CoinbaseCommerceButton
+              styled
+              checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
+              // checkoutId={checkout}
+              // chargeId="CWL2LG2J"
+              onChargeSuccess={(data) => {
+                console.log(data);
+                setFlag(1);
+              }}
+              onChargeFailure={(data) => {
+                console.log(data);
+              }}
+              onPaymentDetected={(data) => {
+                console.log(data);
+              }}
+              onModalClosed={() => {
+                console.log("Payment Cancelled");
+              }}
+            />
+          </>
+        )}
 
         <ApplyMod>
           <Row>Mods</Row>

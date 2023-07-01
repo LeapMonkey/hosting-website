@@ -11,6 +11,7 @@ import { getLocation } from "../utills/getlocation";
 const Profile = () => {
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   const [serviceData, setServiceData] = useState();
+  const [userServiceData, setUserServiceData] = useState();
   const navigate = useNavigate();
 
   const initialData = async () => {
@@ -24,7 +25,10 @@ const Profile = () => {
     const fluxuserdata = fluxalluser?.filter((flux) =>
       service?.some((item) => flux.name === item.servername)
     );
-    console.log(fluxuserdata);
+    const userdata = service?.filter((user) =>
+      fluxalluser?.some((flux) => flux.name === user.servername)
+    );
+    setUserServiceData(userdata);
     setServiceData(fluxuserdata);
   };
 
@@ -56,11 +60,16 @@ const Profile = () => {
           </Banner>
           <WrapperContainer>
             {serviceData &&
-              serviceData.map((item) => (
+              serviceData.map((item, key) => (
                 <UserServerGroup onClick={() => handleItemClick(item)}>
                   <ColumnData>
                     <DefaultTitle>Servers</DefaultTitle>
-                    <DefaultText>{item.name}</DefaultText>
+                    {console.log(userServiceData[key])}
+                    <DefaultText>
+                      {userServiceData[key].changedname
+                        ? userServiceData[key].changedname
+                        : userServiceData[key].servername}
+                    </DefaultText>
                   </ColumnData>
                   <ColumnData>
                     <DefaultTitle>End Date</DefaultTitle>

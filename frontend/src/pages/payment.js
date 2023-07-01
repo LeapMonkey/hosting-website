@@ -75,12 +75,13 @@ const ServerInfo = () => {
   // };
 
   const handleButtonClick = async () => {
+    const randomservice = Math.floor(Math.random() * 100000000000000000000 + 1);
     const data = {
       type: "fluxappregister",
       version: 1,
       appSpecification: {
         version: 6,
-        name: `cubehosting${servicenumber}`,
+        name: `fluidservices${randomservice}`,
         description: location.state.data.title,
         owner: zelID,
         compose: [
@@ -176,7 +177,7 @@ const ServerInfo = () => {
         userid: authdata.user._id,
         name: location.state.data.title,
         currentBlockData: currentBlockData + 22000,
-        servername: `cubehosting${servicenumber}`,
+        servername: `fluidservices${randomservice}`,
       };
       await serviceApi(serviceData);
     }

@@ -1,5 +1,11 @@
 import { allcontinents, allcountries } from "../assets/json/location";
 
+const compareString = (x, y) => {
+  let a = x.label.toUpperCase(),
+    b = y.label.toUpperCase();
+  return a == b ? 0 : a > b ? 1 : -1;
+};
+
 const continentsOptions = (isNegative, possibleLocations) => {
   console.log(isNegative, "possibleLocations", possibleLocations);
   const continents = [
@@ -19,7 +25,7 @@ const continentsOptions = (isNegative, possibleLocations) => {
         });
       }
     });
-  return continents;
+  return continents.sort(compareString);
 };
 const countriesOptions = (continentCode, isNegative, possibleLocations) => {
   const countries = [
@@ -43,7 +49,7 @@ const countriesOptions = (continentCode, isNegative, possibleLocations) => {
         });
       }
     });
-  return countries;
+  return countries.sort(compareString);
 };
 const regionsOptions = (
   continentCode,
@@ -64,7 +70,7 @@ const regionsOptions = (
         });
       }
     });
-  return regions;
+  return regions.sort(compareString);
 };
 const getLocation = (geo) => {
   const specifiedLocation = geo.slice(2);
