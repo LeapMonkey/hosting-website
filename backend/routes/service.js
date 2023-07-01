@@ -7,7 +7,6 @@ const router = express.Router();
 router.post("/save", async (req, res) => {
   try {
     const serviceData = new Service({
-      name: req.body.name,
       userid: req.body.userid,
       currentBlockData: req.body.currentBlockData,
       servername: req.body.servername,
@@ -51,11 +50,15 @@ router.post("/", async (req, res) => {
   }
 });
 router.post("/update", async (req, res) => {
+  console.log(req.body);
   try {
     const serviceData = await Service.findOneAndUpdate(
-      req.body.serverid,
-      req.body
+      { _id: req.body._id },
+      {
+        $set: req.body,
+      }
     );
+    console.log(serviceData);
     return res.status(200).json({
       serviceData,
     });

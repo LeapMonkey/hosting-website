@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
 
 const ServiceSchema = new mongoose.Schema({
-  name: {
-    type: String,
-  },
   userid: {
     type: String,
   },
@@ -11,6 +8,9 @@ const ServiceSchema = new mongoose.Schema({
     type: Number,
   },
   servername: {
+    type: String,
+  },
+  changedname: {
     type: String,
   },
 });
