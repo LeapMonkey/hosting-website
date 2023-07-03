@@ -85,6 +85,20 @@ const getLocation = (geo) => {
     (country) => country.code === countryCode
   ) || { name: "ALL" };
   console.log(continentExists, countryExists, regionName);
-  return continentExists.name + " " + countryExists.name + " " + regionName;
+  let text = "";
+  if (continentExists.name !== "ALL") {
+    if (continentExists) {
+      text = text + continentExists.name;
+    }
+    if (countryExists && countryExists.name !== "ALL") {
+      text = text + " " + countryExists.name;
+    }
+    if (regionName && regionName !== "ALL") {
+      text = text + " " + regionName;
+    }
+  } else {
+    text = "";
+  }
+  return text;
 };
 export { continentsOptions, countriesOptions, regionsOptions, getLocation };

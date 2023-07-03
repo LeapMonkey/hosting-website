@@ -25,6 +25,8 @@ const Profile = () => {
     const fluxuserdata = fluxalluser?.filter((flux) =>
       service?.some((item) => flux.name === item.servername)
     );
+    console.log(fluxuserdata, "service");
+
     const userdata = service?.filter((user) =>
       fluxalluser?.some((flux) => flux.name === user.servername)
     );
@@ -66,9 +68,12 @@ const Profile = () => {
                     <DefaultTitle>Servers</DefaultTitle>
                     {console.log(userServiceData[key])}
                     <DefaultText>
-                      {userServiceData[key].changedname
-                        ? userServiceData[key].changedname
-                        : userServiceData[key].servername}
+                      {userServiceData[userServiceData.length - key - 1]
+                        .changedname
+                        ? userServiceData[userServiceData.length - key - 1]
+                            .changedname
+                        : userServiceData[userServiceData.length - key - 1]
+                            .servername}
                     </DefaultText>
                   </ColumnData>
                   <ColumnData>
