@@ -7,11 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { ARK } from "../components/Image";
 import { getFluxAllUserData, getFluxAuth } from "../utills/manager";
 import { getLocation } from "../utills/getlocation";
+import { toast } from "react-toastify";
 
 const Profile = () => {
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
-  const [serviceData, setServiceData] = useState();
   const [userServiceData, setUserServiceData] = useState();
+  const [userData, setUserData] = useState();
   const navigate = useNavigate();
 
   const initialData = async () => {
@@ -22,17 +23,21 @@ const Profile = () => {
     const service = response.serviceData.filter(
       (item) => item.userid === authdata.user._id
     );
+    setUserData(service);
     const fluxuserdata = fluxalluser?.filter((flux) =>
       service?.some((item) => flux.name === item.servername)
     );
-    console.log(fluxuserdata, "service");
 
-    const userdata = service?.filter((user) =>
-      fluxalluser?.some((flux) => flux.name === user.servername)
+    const userdata = service?.map((user) =>
+      fluxalluser?.filter((flux) => flux.name === user.servername)
     );
+    console.log(userdata, "service");
+
     setUserServiceData(userdata);
-    setServiceData(fluxuserdata);
   };
+  // const getFluxData = async(item) => {
+
+  // }
 
   useEffect(() => {
     if (auth) {
@@ -61,29 +66,35 @@ const Profile = () => {
             </BannerContainer>
           </Banner>
           <WrapperContainer>
-            {serviceData &&
-              serviceData.map((item, key) => (
-                <UserServerGroup onClick={() => handleItemClick(item)}>
+            {userServiceData &&
+              userServiceData?.map((item, key) => (
+                <UserServerGroup
+                  onClick={() =>
+                    item.length > 0
+                      ? handleItemClick(item[0])
+                      : toast("Now Server Settig...")
+                  }
+                >
                   <ColumnData>
                     <DefaultTitle>Servers</DefaultTitle>
-                    {console.log(userServiceData[key])}
                     <DefaultText>
-                      {userServiceData[userServiceData.length - key - 1]
-                        .changedname
-                        ? userServiceData[userServiceData.length - key - 1]
-                            .changedname
-                        : userServiceData[userServiceData.length - key - 1]
-                            .servername}
+                      {userData[key].changedname
+                        ? userData[key]?.changedname
+                        : userData[key]?.servername}
                     </DefaultText>
                   </ColumnData>
                   <ColumnData>
                     <DefaultTitle>End Date</DefaultTitle>
-                    <DefaultText>{item.expires_date}</DefaultText>
+                    <DefaultText>
+                      {item.length > 0 ? item[0]?.expires_date : "setting... "}
+                    </DefaultText>
                   </ColumnData>
                   <ColumnData>
                     <DefaultTitle>Location</DefaultTitle>
                     <DefaultText>
-                      {getLocation(item.geolocation[0])}
+                      {item.length > 0
+                        ? getLocation(item[0]?.geolocation[0])
+                        : "setting..."}
                     </DefaultText>
                   </ColumnData>
                 </UserServerGroup>
