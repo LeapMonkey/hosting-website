@@ -91,11 +91,15 @@ const Register = () => {
           onChange={handleChange}
           type="password"
         />
+
         <Button
-          fsize="28px"
-          text="SIGN UP"
-          fweight="400"
-          bgcolor="linear-gradient(270deg, #06c200, #035c00)"
+          text="Sign Up"
+          width="100%"
+          radius="6px"
+          fweight="500"
+          color="black"
+          fsize="24px"
+          padding="15px"
           onClick={handleClick}
         />
         <GreenText href="/login">Login</GreenText>

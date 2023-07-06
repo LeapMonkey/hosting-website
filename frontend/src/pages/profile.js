@@ -62,7 +62,9 @@ const Profile = () => {
           <Banner>
             <DefaultImage src={ARK} />
             <BannerContainer>
+              <BannerTitle>Profile</BannerTitle>
               <BannerTitle>{auth?.username}</BannerTitle>
+              <BannerTitle>{auth?.email}</BannerTitle>
             </BannerContainer>
           </Banner>
           <WrapperContainer>
@@ -136,16 +138,20 @@ const UserServerGroup = styled(Row)`
   background-color: #00000066;
   width: 100%;
   border-radius: 10px;
+  justify-content: flex-start;
 `;
 
 const ColumnData = styled(Column)`
   align-items: flex-start;
   gap: 5px;
+  min-width: 200px;
 `;
 const Banner = styled(Column)`
   width: 100%;
   position: relative;
   height: 32vh;
+  margin-top: 60px;
+
   img {
     position: absolute;
     height: 100%;
@@ -154,12 +160,13 @@ const Banner = styled(Column)`
     object-fit: cover;
   }
 `;
-const BannerContainer = styled(Row)`
-  height: 100%;
+const BannerContainer = styled(Column)`
+  margin-top: 50px;
   position: relative;
   width: 100%;
-  justify-content: flex-end;
-  align-items: flex-end;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
 `;
 const BannerTitle = styled.h1`
   font-weight: 600;
@@ -167,7 +174,5 @@ const BannerTitle = styled.h1`
   text-shadow: 2px 2px 1px #191919;
   z-index: 2;
   font-size: 32px;
-  margin-right: 50px;
-  margin-bottom: 50px;
 `;
 export default Profile;

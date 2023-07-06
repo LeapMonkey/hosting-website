@@ -59,13 +59,17 @@ const Login = () => {
           value={logininfo.password}
         />
         <Button
-          fsize="28px"
-          text="SIGN IN"
-          fweight="400"
-          bgcolor="linear-gradient(270deg, #06c200, #035c00)"
+          text="Sign In"
+          width="100%"
+          radius="6px"
+          fweight="500"
+          color="black"
+          fsize="24px"
+          padding="15px"
           onClick={handleClick}
         />
-           <GreenText href="/register">Create account</GreenText>
+
+        <GreenText href="/register">Create account</GreenText>
         <GreenText>Forgot your password</GreenText>
       </Container>
     </Wrapper>

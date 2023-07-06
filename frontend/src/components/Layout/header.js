@@ -3,8 +3,9 @@ import { useState } from "react";
 import { Column, DefaultImage, Row } from "../Element";
 import { BiMenu } from "react-icons/bi";
 import { Logo } from "../Image";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const items = [
+let items = [
   {
     href: "/services",
     title: "Services",
@@ -21,17 +22,29 @@ const items = [
 
 const Header = () => {
   const [mobileFlag, setMobileFlag] = useState(false);
-
+  const navigate = useNavigate();
+  const location = useLocation();
+  const handleClick = () => {
+    navigate("/");
+  };
+  const handleChangePath = (item) => {};
+  console.log(location.pathname);
   return (
     <Wrapper>
       <Container>
-        <DefaultImage src={Logo} />
+        <DefaultImage src={Logo} onClick={handleClick} />
         <ItemWrapper>
-          {items.map((item, key) => (
-            <ItemContent href={item.href} key={key}>
-              {item.title}
-            </ItemContent>
-          ))}
+          {items?.map((item, key) =>
+            location.pathname === item.href ? (
+              <ItemContent href={item.href} key={key} flag="1">
+                {item.title}
+              </ItemContent>
+            ) : (
+              <ItemContent href={item.href} key={key}>
+                {item.title}
+              </ItemContent>
+            )
+          )}
         </ItemWrapper>
         <ItemContent href="/login">
           <DefaultImage src="https://minotar.net/helm/MHF_Steve/24.png" />
@@ -75,6 +88,7 @@ const Container = styled(Row)`
   img {
     width: 120px;
     height: 64px;
+    margin-right: 68px;
   }
   background-color: #2f2f2f;
   @media screen and (max-width: 768px) {
@@ -122,6 +136,7 @@ const ItemContent = styled.a`
   line-height: 64px;
   text-align: center;
   min-width: 10vw;
+  background: ${(props) => props.flag && "rgba(0, 0, 0, 0.3)"};
   :hover {
     background: rgba(0, 0, 0, 0.3);
     height: 100%;

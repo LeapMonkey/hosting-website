@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { gameitems } from "../assets/json/gamedata";
 import { useEffect } from "react";
+import { ARK } from "../components/Image";
 const items = [];
 const tapitems = [{ title: "Games" }];
 
@@ -39,7 +40,7 @@ const Landing = () => {
   return (
     <Wrapper length={gameitems.length}>
       <Banner>
-        <DefaultImage src="https://www.creeperhost.net/2edd99e6d1c1301dec2fef8d88764f6c.png" />
+        <DefaultImage src={ARK} />
         <BannerContainer>
           <BannerTitle>Our Gaming Services</BannerTitle>
         </BannerContainer>

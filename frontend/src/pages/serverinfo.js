@@ -499,7 +499,7 @@ const ServerInfo = () => {
             onChange={(e) => setServername(e.target.value)}
           />
           <Button
-            text="Update Server name"
+            text="Server name"
             width="100%"
             radius="6px"
             fweight="500"
@@ -515,7 +515,7 @@ const ServerInfo = () => {
             onChange={(e) => setEnvironment(e.target.value)}
           />
           <Button
-            text="Update Environment"
+            text="Settings"
             width="100%"
             radius="6px"
             fweight="500"
@@ -580,7 +580,7 @@ const ServerInfo = () => {
         <ButtonGroup2>
           {possibleLocations && (
             <Button
-              text="Update Geolocation"
+              text="Geolocation"
               width="100%"
               radius="6px"
               fweight="500"
@@ -627,16 +627,6 @@ const ServerInfo = () => {
             />
           </>
         )}
-
-        <ApplyMod>
-          <Row>Mods</Row>
-          <Row>Current Mod - FTB-stoneblock3.1.6.1</Row>
-        </ApplyMod>
-        <Title>Advance ssh </Title>
-        <ButtonGroup>
-          <Title>Definition</Title>
-          <Row>Reinstalls: Devices and reinstalls all </Row>
-        </ButtonGroup>
       </WrapperContainer>
     </Wrapper>
   );
@@ -647,6 +637,7 @@ const Wrapper = styled(Column)`
   color: white;
   padding: 20px;
   gap: 20px;
+  min-height: 100vh;
 `;
 const WrapperContainer = styled(Column)`
   gap: 20px;
@@ -679,10 +670,6 @@ const ButtonGroup2 = styled(ButtonGroup)`
 const ColumnButton = styled(Column)`
   gap: 5px;
   width: 250px;
-`;
-const ApplyMod = styled(Column)`
-  gap: 10px;
-  width: 100%;
 `;
 
 export default ServerInfo;

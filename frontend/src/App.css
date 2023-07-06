@@ -21,9 +21,25 @@ button {
   border: none;
 }
 .basic-single  {
-	color: black;
-	width: 100%;
 	font-size: 16px;
 	line-height: 37px;
+	width: 100%;
+	color: white !important;
 }
 
+.basic-single .select__control {
+	background-color: #272727 !important;
+	border-radius: 5px ;
+	color: white;
+}
+.basic-single .select__menu {
+	background-color: #272727 !important;
+	border-radius: 5px ;
+	color: white;
+}
+.basic-single .select__single-value  {
+	color: white;
+}
+.basic-single .select__menu-list  {
+color: red;
+}

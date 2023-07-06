@@ -30,7 +30,6 @@ const Purchase = () => {
               </CardPrice>
               <CardTitle>
                 <CardTitleHeader>Budget</CardTitleHeader>{" "}
-                <>For Beginner Who Want To Scale Business Globally</>
               </CardTitle>
               <CardDetail>
                 <CardDetailItem>
@@ -64,7 +63,6 @@ const Purchase = () => {
               </CardPrice>
               <CardTitle>
                 <CardTitleHeader>Performance</CardTitleHeader>{" "}
-                <>For Beginner Who Want To Scale Business Globally</>
               </CardTitle>
               <CardDetail>
                 <CardDetailItem>
