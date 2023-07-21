@@ -427,7 +427,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleStartClick(location.state.data.name)}
@@ -437,7 +437,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleStopClick(location.state.data.name)}
@@ -447,7 +447,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleRestartClick(location.state.data.name)}
@@ -460,7 +460,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleReinstallClick(location.state.data.name)}
@@ -471,7 +471,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleRedeployClick(location.state.data.name)}
@@ -485,7 +485,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={() => handleHardRedeployClick(location.state.data.name)}
@@ -495,7 +495,7 @@ const ServerInfo = () => {
         <Title>Update</Title>
         <ButtonGroup2>
           <Input
-            placeholder=""
+            placeholder="Server Name"
             onChange={(e) => setServername(e.target.value)}
           />
           <Button
@@ -503,7 +503,7 @@ const ServerInfo = () => {
             width="100%"
             radius="6px"
             fweight="500"
-            color="black"
+            color="white"
             fsize="16px"
             padding="15px"
             onClick={updateServerName}
@@ -511,7 +511,7 @@ const ServerInfo = () => {
         </ButtonGroup2>
         <ButtonGroup2>
           <Input
-            placeholder="[`Admin`]"
+            placeholder="[`settings`]"
             onChange={(e) => setEnvironment(e.target.value)}
           />
           <Button
@@ -519,7 +519,7 @@ const ServerInfo = () => {
             width="100%"
             radius="6px"
             fweight="500"
-            color="black"
+            color="white"
             fsize="16px"
             padding="15px"
             onClick={!isButtonDisabled ? updateEnvironmentData : undefined}
@@ -584,7 +584,7 @@ const ServerInfo = () => {
               width="100%"
               radius="6px"
               fweight="500"
-              color="black"
+              color="white"
               fsize="16px"
               padding="15px"
               onClick={!isButtonDisabled ? updateGeolocationData : undefined}
@@ -598,7 +598,7 @@ const ServerInfo = () => {
             width="100%"
             radius="6px"
             fweight="500"
-            color="black"
+            color="white"
             fsize="16px"
             padding="15px"
           />

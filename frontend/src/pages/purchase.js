@@ -50,7 +50,7 @@ const Purchase = () => {
                 width="100%"
                 radius="6px"
                 fweight="500"
-                color="black"
+                color="white"
                 fsize="16px"
                 padding="15px"
                 onClick={() => handleClick(selectedData, 1)}
@@ -83,7 +83,7 @@ const Purchase = () => {
                 width="100%"
                 radius="6px"
                 fweight="500"
-                color="black"
+                color="white"
                 fsize="16px"
                 padding="15px"
                 onClick={() => handleClick(selectedData, 2)}

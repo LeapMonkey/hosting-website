@@ -264,6 +264,23 @@ const getAppSpecification = async (server) => {
     .catch((err) => console.log(err));
 };
 
+const gethardwareSpecification = async (server) => {
+  try {
+    const response = await fetch(`https://api.runonflux.io/apps/appspecifications/${server}`);
+    const data = await response.json();
+    if (data.status === 'success' && data.data && data.data.compose && data.data.compose.length > 0) {
+      const { cpu, ram, hdd } = data.data.compose[0];
+      console.log('CPU:', cpu);
+      console.log('RAM:', ram);
+      console.log('HDD:', hdd);
+    } else {
+      console.log('Error: Unable to parse data or data not available.');
+    }
+  } catch (error) {
+    console.log('Error fetching data:', error);
+  }
+};
+
 const getFluxAllUserData = async () => {
   const Fluxauth = JSON.parse(localStorage.getItem("fluxauth"));
   return await fetch(
@@ -295,4 +312,5 @@ export {
   getExpire,
   getFluxAllUserData,
   getbenchmarks,
+  gethardwareSpecification,
 };

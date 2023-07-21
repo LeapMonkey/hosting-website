@@ -97,13 +97,13 @@ const Register = () => {
           width="100%"
           radius="6px"
           fweight="500"
-          color="black"
+          color="white"
           fsize="24px"
           padding="15px"
           onClick={handleClick}
         />
-        <GreenText href="/login">Login</GreenText>
-        <GreenText>Forgot your password</GreenText>
+        <a href="/login" class="custom-link">Login</a>
+        <a class="custom-link">Forgot your password</a>
       </Container>
     </Wrapper>
   );

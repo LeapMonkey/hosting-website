@@ -63,14 +63,13 @@ const Login = () => {
           width="100%"
           radius="6px"
           fweight="500"
-          color="black"
+          color="white"
           fsize="24px"
           padding="15px"
           onClick={handleClick}
         />
-
-        <GreenText href="/register">Create account</GreenText>
-        <GreenText>Forgot your password</GreenText>
+        <a href="/register" class="custom-link">Create account</a>
+        <a class="custom-link">Forgot your password</a>
       </Container>
     </Wrapper>
   );

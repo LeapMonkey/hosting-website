@@ -95,9 +95,9 @@ const ServerInfo = () => {
             commands: [],
             containerPorts: location.state.data.containerPorts,
             containerData: location.state.data.containerData,
-            cpu: 0.1,
-            ram: 100,
-            hdd: 1,
+            cpu: cpu,
+            ram: ram * 1000,
+            hdd: hdd,
             tiered: false,
           },
         ],
@@ -143,7 +143,7 @@ const ServerInfo = () => {
 
     const paidaddress = await getPaidaddress();
 
-    const amount = await getAmout(0.1, 100, 1, 22000);
+    const amount = await getAmout(cpu, ram * 1000, hdd, 22000);
 
     console.log(registerhash, amount, paidaddress, "paidaddress");
     const hashdata = await getHash(registerhash, amount, paidaddress);
@@ -189,34 +189,16 @@ const ServerInfo = () => {
         <Title>Billing</Title>
         <PriceDetail>
           <PriceDetailWrapper>
-            <Row>Threads</Row>
-            <Row>RAM</Row>
-            <Row>Storage</Row>
-          </PriceDetailWrapper>
-          <PriceDetailWrapper>
+            <row>{location.state.data.title}</row>
             <Row>
               <BoldTitle>{cpu}</BoldTitle>
-              Threads
+              vCores
             </Row>
             <Row>
-              <BoldTitle>{ram}</BoldTitle> RAM
+              <BoldTitle>{ram}</BoldTitle>GB RAM
             </Row>
             <Row>
-              <BoldTitle>{hdd}</BoldTitle> Storage
-            </Row>
-          </PriceDetailWrapper>
-          <PriceDetailWrapper>
-            <Row>
-              <BoldTitle>{cpu * 3.62}</BoldTitle>
-              Threads Cost USD
-            </Row>
-            <Row>
-              <BoldTitle>{(ram * 0.19) / 1000}</BoldTitle>
-              RAM Cost USD
-            </Row>
-            <Row>
-              <BoldTitle>{hdd * 0.1}</BoldTitle>
-              Storage Cost USD
+              <BoldTitle>{hdd}</BoldTitle>GB Storage
             </Row>
           </PriceDetailWrapper>
         </PriceDetail>
@@ -235,7 +217,7 @@ const ServerInfo = () => {
                     width="180px"
                     radius="6px"
                     fweight="500"
-                    color="black"
+                    color="white"
                     fsize="16px"
                     padding="15px"
                     onClick={handleButtonClick}
@@ -248,7 +230,7 @@ const ServerInfo = () => {
                   width="100%"
                   radius="6px"
                   fweight="500"
-                  color="black"
+                  color="white"
                   fsize="16px"
                   padding="15px"
                 />
@@ -259,7 +241,7 @@ const ServerInfo = () => {
                 width="180px"
                 radius="6px"
                 fweight="500"
-                color="black"
+                color="white"
                 fsize="16px"
                 padding="15px"
                 onClick={handleButtonClick}
@@ -268,11 +250,11 @@ const ServerInfo = () => {
           </ButtonWrapper>
         ) : (
           <>
-            <Paypal cost="1" setFlag={setFlag} />
+            <Paypal cost={total} setFlag={setFlag} />
             <CoinbaseCommerceButton
               styled
-              checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
-              // checkoutId={checkout}
+              // checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
+              checkoutId={checkout}
               // chargeId="CWL2LG2J"
               onChargeSuccess={(data) => {
                 console.log(data);

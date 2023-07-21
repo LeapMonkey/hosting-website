@@ -28,6 +28,7 @@ const Wrapper = styled(Column)`
   width: 100%;
   text-align: center;
   max-width: ${(props) => props.width && props.width};
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 1); /* Add this line for the dark drop shadow effect */
   :hover {
     box-shadow: 0 0 10px -1px rgba(0, 255, 0, 1);
   }
