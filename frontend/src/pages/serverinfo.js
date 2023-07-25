@@ -46,19 +46,14 @@ const ServerInfo = () => {
   const [flag, setFlag] = useState(0);
   const [clickCheck, setClickCheck] = useState(false);
   const [priceData, setPriceData] = useState();
+  const [checkoutdata, setCheckoutData] = useState();
+
   console.log(isButtonDisabled, "isButtonDisabled");
   const getIpData = async () => {
     const ipdata = await getIpaddress(location.state.data.name);
     setIpData(ipdata);
   };
-  const checkout =
-    location.state.flag === 1
-      ? location.state.data.checkout1
-      : location.state.data.checkout2;
-  const total =
-    location.state.flag === 1
-      ? location.state.data.price1
-      : location.state.data.price2;
+  console.log(location.state.data.components[0]);
   const updateExpireData = async () => {
     if (flag === 1) {
       setClickCheck(false);
@@ -88,9 +83,9 @@ const ServerInfo = () => {
               commands: [],
               containerPorts: olddata.compose[0].containerPorts,
               containerData: olddata.compose[0].containerData,
-              cpu: 0.2,
-              ram: 200,
-              hdd: 1,
+              cpu: location.state.data.components[0].cpu,
+              ram: location.state.data.components[0].ram,
+              hdd: location.state.data.components[0].hdd,
               tiered: false,
             },
           ],
@@ -166,9 +161,9 @@ const ServerInfo = () => {
             commands: [],
             containerPorts: olddata.compose[0].containerPorts,
             containerData: olddata.compose[0].containerData,
-            cpu: 0.2,
-            ram: 200,
-            hdd: 1,
+            cpu: location.state.data.components[0].cpu,
+            ram: location.state.data.components[0].ram,
+            hdd: location.state.data.components[0].hdd,
             tiered: false,
           },
         ],
@@ -242,9 +237,9 @@ const ServerInfo = () => {
             commands: [],
             containerPorts: olddata.compose[0].containerPorts,
             containerData: olddata.compose[0].containerData,
-            cpu: 0.2,
-            ram: 200,
-            hdd: 1,
+            cpu: location.state.data.components[0].cpu,
+            ram: location.state.data.components[0].ram,
+            hdd: location.state.data.components[0].hdd,
             tiered: false,
           },
         ],
@@ -320,7 +315,13 @@ const ServerInfo = () => {
       pricedata[0].cpu1 === location.state.data.components[0].cpu
         ? pricedata[0].price1
         : pricedata[0].price2;
+
+    const checkout =
+      pricedata[0].cpu1 === location.state.data.components[0].cpu
+        ? pricedata[0].checkout1
+        : pricedata[0].checkout1;
     setPriceData(suitabledata);
+    setCheckoutData(checkout);
   }, []);
 
   const getPossibleLocation = async () => {
@@ -612,11 +613,11 @@ const ServerInfo = () => {
         </ButtonGroup2>
         {clickCheck && (
           <>
-            <Paypal cost={total} setFlag={setFlag} />
+            <Paypal cost={priceData} setFlag={setFlag} />
             <CoinbaseCommerceButton
               styled
               // checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
-              checkoutId={checkout}
+              checkoutId={checkoutdata}
               // chargeId="CWL2LG2J"
               onChargeSuccess={(data) => {
                 console.log(data);
