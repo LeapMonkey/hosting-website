@@ -51,7 +51,14 @@ const ServerInfo = () => {
     const ipdata = await getIpaddress(location.state.data.name);
     setIpData(ipdata);
   };
-
+  const checkout =
+    location.state.flag === 1
+      ? location.state.data.checkout1
+      : location.state.data.checkout2;
+  const total =
+    location.state.flag === 1
+      ? location.state.data.price1
+      : location.state.data.price2;
   const updateExpireData = async () => {
     if (flag === 1) {
       setClickCheck(false);
@@ -605,11 +612,11 @@ const ServerInfo = () => {
         </ButtonGroup2>
         {clickCheck && (
           <>
-            <Paypal cost="1" setFlag={setFlag} />
+            <Paypal cost={total} setFlag={setFlag} />
             <CoinbaseCommerceButton
               styled
-              checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
-              // checkoutId={checkout}
+              // checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
+              checkoutId={checkout}
               // chargeId="CWL2LG2J"
               onChargeSuccess={(data) => {
                 console.log(data);
