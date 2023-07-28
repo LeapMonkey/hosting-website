@@ -266,18 +266,25 @@ const getAppSpecification = async (server) => {
 
 const gethardwareSpecification = async (server) => {
   try {
-    const response = await fetch(`https://api.runonflux.io/apps/appspecifications/${server}`);
+    const response = await fetch(
+      `https://api.runonflux.io/apps/appspecifications/${server}`
+    );
     const data = await response.json();
-    if (data.status === 'success' && data.data && data.data.compose && data.data.compose.length > 0) {
+    if (
+      data.status === "success" &&
+      data.data &&
+      data.data.compose &&
+      data.data.compose.length > 0
+    ) {
       const { cpu, ram, hdd } = data.data.compose[0];
-      console.log('CPU:', cpu);
-      console.log('RAM:', ram);
-      console.log('HDD:', hdd);
+      console.log("CPU:", cpu);
+      console.log("RAM:", ram);
+      console.log("HDD:", hdd);
     } else {
-      console.log('Error: Unable to parse data or data not available.');
+      console.log("Error: Unable to parse data or data not available.");
     }
   } catch (error) {
-    console.log('Error fetching data:', error);
+    console.log("Error fetching data:", error);
   }
 };
 
@@ -291,6 +298,15 @@ const getFluxAllUserData = async () => {
     )}&loginPhrase=${Fluxauth.loginPhrase}`
   )
     .then((res) => res.json())
+    .catch((err) => console.log(err));
+};
+
+const getFluxData = async () => {
+  return await fetch(`https://api.runonflux.io/apps/globalappsspecifications`, {
+    method: "get",
+  })
+    .then((res) => res.json())
+    .then((response) => response.data)
     .catch((err) => console.log(err));
 };
 
@@ -313,4 +329,5 @@ export {
   getFluxAllUserData,
   getbenchmarks,
   gethardwareSpecification,
+  getFluxData,
 };

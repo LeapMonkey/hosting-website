@@ -84,7 +84,6 @@ const getLocation = (geo) => {
   const countryExists = allcountries.find(
     (country) => country.code === countryCode
   ) || { name: "ALL" };
-  console.log(continentExists, countryExists, regionName);
   let text = "";
   if (continentExists.name !== "ALL") {
     if (continentExists) {
@@ -97,8 +96,9 @@ const getLocation = (geo) => {
       text = text + " " + regionName;
     }
   } else {
-    text = "";
+    text = "ALL";
   }
+  console.log(text);
   return text;
 };
 export { continentsOptions, countriesOptions, regionsOptions, getLocation };

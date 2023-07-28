@@ -5,13 +5,18 @@ import { useState } from "react";
 import { getServiceApi } from "../action/action";
 import { useNavigate } from "react-router-dom";
 import { ARK } from "../components/Image";
-import { getFluxAllUserData, getFluxAuth } from "../utills/manager";
+import {
+  getFluxAllUserData,
+  getFluxAuth,
+  getFluxData,
+} from "../utills/manager";
 import { getLocation } from "../utills/getlocation";
 import { toast } from "react-toastify";
 
 const Profile = () => {
   const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   const [userServiceData, setUserServiceData] = useState();
+  const [userServiceData2, setUserServiceData2] = useState();
   const [userData, setUserData] = useState();
   const navigate = useNavigate();
 
@@ -20,19 +25,20 @@ const Profile = () => {
     setAuth(authdata.user);
     const response = await getServiceApi();
     const fluxalluser = await getFluxAllUserData();
+    const fluxdata = await getFluxData();
+
     const service = response.serviceData.filter(
       (item) => item.userid === authdata.user._id
     );
     setUserData(service);
-    const fluxuserdata = fluxalluser?.filter((flux) =>
-      service?.some((item) => flux.name === item.servername)
-    );
 
     const userdata = service?.map((user) =>
       fluxalluser?.filter((flux) => flux.name === user.servername)
     );
-    console.log(userdata, "service");
-
+    const userdatas = service?.map((user) =>
+      fluxdata?.filter((flux) => flux.name === user.servername)
+    );
+    setUserServiceData2(userdatas);
     setUserServiceData(userdata);
   };
   // const getFluxData = async(item) => {
@@ -74,9 +80,15 @@ const Profile = () => {
                   onClick={() =>
                     item.length > 0
                       ? handleItemClick(item[0])
+                      : userServiceData2[key].length > 0
+                      ? handleItemClick(userServiceData2[key][0])
                       : toast("Now Server Settig...")
                   }
                 >
+                  {console.log(
+                    userServiceData2[key][0],
+                    "userServiceData2[key][0]"
+                  )}
                   <ColumnData>
                     <DefaultTitle>Servers</DefaultTitle>
                     <DefaultText>
@@ -88,7 +100,9 @@ const Profile = () => {
                   <ColumnData>
                     <DefaultTitle>End Date</DefaultTitle>
                     <DefaultText>
-                      {item.length > 0 ? item[0]?.expires_date : "setting... "}
+                      {item.length > 0 && item[0]?.expires_date
+                        ? item[0]?.expires_date
+                        : "setting... "}
                     </DefaultText>
                   </ColumnData>
                   <ColumnData>

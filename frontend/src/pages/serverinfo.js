@@ -53,7 +53,6 @@ const ServerInfo = () => {
     const ipdata = await getIpaddress(location.state.data.name);
     setIpData(ipdata);
   };
-  console.log(location.state.data.components[0]);
   const updateExpireData = async () => {
     if (flag === 1) {
       setClickCheck(false);
@@ -83,9 +82,15 @@ const ServerInfo = () => {
               commands: [],
               containerPorts: olddata.compose[0].containerPorts,
               containerData: olddata.compose[0].containerData,
-              cpu: location.state.data.components[0].cpu,
-              ram: location.state.data.components[0].ram,
-              hdd: location.state.data.components[0].hdd,
+              cpu: location.state.data?.components
+                ? location.state.data?.components[0].cpu
+                : location.state.data?.compose[0].cpu,
+              ram: location.state.data?.components
+                ? location.state.data?.components[0].ram
+                : location.state.data?.compose[0].ram,
+              hdd: location.state.data?.components
+                ? location.state.data?.components[0].hdd
+                : location.state.data?.compose[0].hdd,
               tiered: false,
             },
           ],
@@ -161,9 +166,15 @@ const ServerInfo = () => {
             commands: [],
             containerPorts: olddata.compose[0].containerPorts,
             containerData: olddata.compose[0].containerData,
-            cpu: location.state.data.components[0].cpu,
-            ram: location.state.data.components[0].ram,
-            hdd: location.state.data.components[0].hdd,
+            cpu: location.state.data?.components
+              ? location.state.data?.components[0].cpu
+              : location.state.data?.compose[0].cpu,
+            ram: location.state.data?.components
+              ? location.state.data?.components[0].ram
+              : location.state.data?.compose[0].ram,
+            hdd: location.state.data?.components
+              ? location.state.data?.components[0].hdd
+              : location.state.data?.compose[0].hdd,
             tiered: false,
           },
         ],
@@ -237,9 +248,15 @@ const ServerInfo = () => {
             commands: [],
             containerPorts: olddata.compose[0].containerPorts,
             containerData: olddata.compose[0].containerData,
-            cpu: location.state.data.components[0].cpu,
-            ram: location.state.data.components[0].ram,
-            hdd: location.state.data.components[0].hdd,
+            cpu: location.state.data?.components
+              ? location.state.data?.components[0].cpu
+              : location.state.data?.compose[0].cpu,
+            ram: location.state.data?.components
+              ? location.state.data?.components[0].ram
+              : location.state.data?.compose[0].ram,
+            hdd: location.state.data?.components
+              ? location.state.data?.components[0].hdd
+              : location.state.data?.compose[0].hdd,
             tiered: false,
           },
         ],
@@ -311,13 +328,20 @@ const ServerInfo = () => {
     const pricedata = gameitems.filter(
       (item) => item.title === location.state.data.description
     );
+
     const suitabledata =
-      pricedata[0].cpu1 === location.state.data.components[0].cpu
+      pricedata[0].cpu1 ===
+      (location.state.data?.components
+        ? location.state.data?.components[0].cpu
+        : location.state.data?.compose[0].cpu)
         ? pricedata[0].price1
         : pricedata[0].price2;
 
     const checkout =
-      pricedata[0].cpu1 === location.state.data.components[0].cpu
+      pricedata[0].cpu1 ===
+      (location.state.data?.components
+        ? location.state.data?.components[0].cpu
+        : location.state.data?.compose[0].cpu)
         ? pricedata[0].checkout1
         : pricedata[0].checkout1;
     setPriceData(suitabledata);
@@ -421,11 +445,17 @@ const ServerInfo = () => {
           {/* {ipData?.map((item, key) => (
             <Row key={key}>
                - PORT -{" "}
-              {location.state.data.components[0].ports}
+              {location.state.data?.components[0].ports}
             </Row>
           ))} */}
           {/* <Row>IPv4 - {ipData?.ipaddress}</Row> */}
-          <Row>Port - {location.state.data.components[0].ports}</Row>
+          {console.log(location.state.data)}
+          <Row>
+            Port -{" "}
+            {location.state.data?.components
+              ? location.state.data?.components[0]?.[0]?.ports
+              : location.state.data?.compose[0].ports[0]}
+          </Row>
         </ServerInfoPart>
         <ButtonGroup>
           <ColumnButton>
