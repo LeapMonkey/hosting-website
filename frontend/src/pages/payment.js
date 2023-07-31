@@ -264,7 +264,7 @@ const ServerInfo = () => {
                 console.log(data);
               }}
               onPaymentDetected={(data) => {
-                console.log(data);
+                setFlag(1);
               }}
               onModalClosed={() => {
                 console.log("Payment Cancelled");
