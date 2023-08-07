@@ -15,7 +15,7 @@ let items = [
     title: "Profile",
   },
   {
-    href: "/wiki",
+    href: "/contact",
     title: "Wiki",
   },
 ];

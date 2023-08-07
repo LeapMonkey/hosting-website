@@ -3,31 +3,24 @@ import { Column, DefaultImage, Row } from "../components/Element";
 import Input from "../components/Element/input";
 import TextArea from "../components/Element/textarea";
 import Button from "../components/Element/button";
+import { ARK } from "../components/Image";
 
 const Contact = () => {
   return (
     <Wrapper>
       <Banner>
-        <DefaultImage src="https://www.creeperhost.net/92fb27d793290ecad0df18b70a7f5ef8.png" />
+        <DefaultImage src={ARK} />
         <BannerContainer>
-          <BannerTitle>Contact Us</BannerTitle>
+          <BannerTitle>Server Documentation</BannerTitle>
         </BannerContainer>
       </Banner>
       <LayoutWrapper>
         <ContactWrapper>
           <Title>Email Us</Title>
-          <InputWrapper>
             <Label>Name</Label>
-            <Input></Input>
-          </InputWrapper>
-          <InputWrapper>
             <Label>Email</Label>
-            <Input></Input>
-          </InputWrapper>
-          <InputWrapper>
             <Label>Message</Label>
             <TextArea />
-          </InputWrapper>
           <ButtonWrapper>
             <Button text="Submit" width="250px" fsize="16px" />
           </ButtonWrapper>

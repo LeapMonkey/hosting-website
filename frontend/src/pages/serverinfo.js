@@ -437,26 +437,26 @@ const ServerInfo = () => {
   return (
     <Wrapper>
       <WrapperContainer>
-        <ServerInfoPart>
+      <ServerInfoPart>
           <Title>Server Information</Title>
           <Row>Server Name - {location.state.data.name}</Row>
           <Row>Description - {location.state.data.description}</Row>
-          IPv4 - {ipData && ipData[0].ip.split(":")[0]}
+          IPv4 - {ipData ? ipData[0].ip.split(":")[0] : "setting"}
           {/* {ipData?.map((item, key) => (
-            <Row key={key}>
-               - PORT -{" "}
-              {location.state.data?.components[0].ports}
-            </Row>
+           <Row key={key}>
+              - PORT -{" "}
+            {location.state.data?.components[0].ports}
+           </Row>
           ))} */}
           {/* <Row>IPv4 - {ipData?.ipaddress}</Row> */}
           {console.log(location.state.data)}
           <Row>
-            Port -{" "}
+            Port - {"34001"}
             {location.state.data?.components
-              ? location.state.data?.components[0]?.[0]?.ports
-              : location.state.data?.compose[0].ports[0]}
+               ? location.state.data?.components[0]?.[0]?.ports
+                : location.state.data?.compose[0].ports[0]}
           </Row>
-        </ServerInfoPart>
+      </ServerInfoPart>
         <ButtonGroup>
           <ColumnButton>
             <Title> Control</Title>
@@ -537,7 +537,7 @@ const ServerInfo = () => {
             onChange={(e) => setServername(e.target.value)}
           />
           <Button
-            text="Server name"
+            text="Set Name"
             width="100%"
             radius="6px"
             fweight="500"
@@ -567,6 +567,7 @@ const ServerInfo = () => {
         <ButtonGroup2>
           {possibleLocations && (
             <Select
+              placeholder="Geolocation"
               className="basic-single"
               classNamePrefix="select"
               isSearchable="true"
@@ -584,6 +585,7 @@ const ServerInfo = () => {
                 setCountry(e);
                 setRegion("");
               }}
+              placeholder="Country"
               className="basic-single"
               classNamePrefix="select"
               isSearchable="true"
@@ -599,6 +601,7 @@ const ServerInfo = () => {
           )}
           {continent && country && (
             <Select
+              placeholder="Region"
               className="basic-single"
               classNamePrefix="select"
               isSearchable="true"
@@ -618,7 +621,7 @@ const ServerInfo = () => {
         <ButtonGroup2>
           {possibleLocations && (
             <Button
-              text="Geolocation"
+              text="Set Geolocation"
               width="100%"
               radius="6px"
               fweight="500"
