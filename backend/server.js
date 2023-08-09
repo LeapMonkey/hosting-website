@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import userRoutes from "./routes/users.js";
 import serviceRoutes from "./routes/service.js";
+import codeRoutes from "./routes/code.js";
 import path from "path";
 import bodyParser from "body-parser";
 /* App Config */
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 /* API Routes -> The first part is the default path for all the requests in that users.js file there we have to continue from this path */
 app.use("/api/users", userRoutes);
 app.use("/api/services", serviceRoutes);
+app.use("/api/codes", codeRoutes);
 
 mongoose
   .connect(process.env.MONGO_URL, {
