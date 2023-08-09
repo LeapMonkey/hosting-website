@@ -46,6 +46,7 @@ const ServerInfo = () => {
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
   const [servicenumber, setServiceNumber] = useState();
+  const [code, setCode] = useState("");
   const [flag, setFlag] = useState();
   const initialData = async () => {
     getFluxAuth();
@@ -206,6 +207,14 @@ const ServerInfo = () => {
           <Title>Total Cost</Title>
           <BoldTitle>{total}</BoldTitle>
         </CostDetail>
+        <CostDetail>
+          <Title>Referal Code</Title>
+          <ReferalInput
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+        </CostDetail>
 
         {flag === 1 ? (
           <ButtonWrapper>
@@ -319,5 +328,13 @@ const ButtonWrapper = styled(Row)`
   gap: 20px;
   width: 100%;
   flex-wrap: wrap;
+`;
+const ReferalInput = styled.input`
+  height: 40px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 24px;
+  padding: 4px 6px;
 `;
 export default ServerInfo;

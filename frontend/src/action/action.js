@@ -1,4 +1,5 @@
-const baseURL = "http://localhost:8000";
+import { URL_CONFIG } from "../config";
+const baseURL = URL_CONFIG.BASE_URL;
 
 export const loginApi = async (payload) => {
   try {
