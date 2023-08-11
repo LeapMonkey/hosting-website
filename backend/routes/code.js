@@ -8,7 +8,6 @@ router.post("/add", async (req, res) => {
   try {
     const expiration = new Date(req.body.expiration);
     const codeData = new Code({
-      userId: req.body.userId,
       code: req.body.code,
       expiration: expiration,
     });
@@ -19,32 +18,33 @@ router.post("/add", async (req, res) => {
   }
 });
 
-// router.post("/use", async (req, res) => {
-//   try {
-//     const { code, userId } = req.body;
-//     const codeDB = await Code.findOne({
-//       code: code,
-//       userId: userId,
-//     });
-//     if (!codeDB) {
-//       return res.status(400).json({ message: "invalid code" });
-//     }
-//     if (codeDB.expiration < new Date()) {
-//       return res.status(400).json({ message: "expired code" });
-//     }
-//     await Code.findOneAndUpdate(
-//       { code: code, userId: userId },
-//       { used: codeDB.used + 1 }
-//     );
-//     return res.status(200).json({ message: "success" });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
+router.post("/use", async (req, res) => {
+  // try {
+  //   const { code, userId } = req.body;
+  //   const codeDB = await Code.findOne({
+  //     code: code,
+  //     userId: userId,
+  //   });
+  //   if (!codeDB) {
+  //     return res.status(400).json({ message: "invalid code" });
+  //   }
+  //   if (codeDB.expiration < new Date()) {
+  //     return res.status(400).json({ message: "expired code" });
+  //   }
+  //   await Code.findOneAndUpdate(
+  //     { code: code, userId: userId },
+  //     { used: codeDB.used + 1 }
+  //   );
+  //   return res.status(200).json({ message: "success" });
+  // } catch (err) {
+  //   console.log(err);
+  // }
+});
 
 router.post("/validateCode", async (req, res) => {
   try {
     const { code } = req.body;
+    console.log({ code });
     const codeDB = await Code.findOne({ code: code });
     console.log(codeDB);
     if (!codeDB) {
@@ -75,19 +75,9 @@ router.post("/updateExpiration", async (req, res) => {
 
 router.post("/delete", async (req, res) => {
   try {
-    const { code, userId } = req.body;
-    await Code.findOneAndDelete({ code: code, userId: userId });
+    const { code } = req.body;
+    await Code.findOneAndDelete({ code: code });
     return res.status(200).json({ message: "success" });
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-router.post("/getCodes", async (req, res) => {
-  try {
-    const { userId } = req.body;
-    const codes = await Code.find({ userId: userId }).populate("userId");
-    return res.status(200).json({ data: codes });
   } catch (err) {
     console.log(err);
   }
@@ -95,7 +85,7 @@ router.post("/getCodes", async (req, res) => {
 
 router.get("/getCodes", async (req, res) => {
   try {
-    const codes = await Code.find().populate("userId");
+    const codes = await Code.find();
     return res.status(200).json({ data: codes });
   } catch (err) {
     console.log(err);

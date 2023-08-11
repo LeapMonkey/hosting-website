@@ -40,35 +40,8 @@ const Profile = () => {
   const [code, setCode] = useState(generateString(8));
   const [isValid, setIsValid] = useState(true);
   const [expiration, setExpiration] = useState(now);
-  const [updatedExpiration, setUpdatedExpiration] = useState(now);
-  const [codeForUpdate, setCodeForUpdate] = useState("");
   const [codes, setCodes] = useState([]);
-  const [isOpenEditModal, setIsOpenEditModal] = useState(false);
-  const [activeCode, setActiveCode] = useState(null);
-  const [isInAction, setIsInAction] = useState(false);
   const navigate = useNavigate();
-
-  const generateNewCode = () => {
-    setCode(generateString(8));
-  };
-
-  const dateToString = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year}-${month < 10 ? "0" + month : month}-${
-      day < 10 ? "0" + day : day
-    }`;
-  };
-
-  const validateExpiration = (_expiration) => {
-    const nowTime = new Date(now);
-    const expirationTime = new Date(_expiration);
-    if (nowTime > expirationTime) {
-      return false;
-    }
-    return true;
-  };
 
   const initialData = async () => {
     const authdata = JSON.parse(localStorage.getItem("auth"));
@@ -91,67 +64,6 @@ const Profile = () => {
     setUserServiceData2(userdatas);
     setUserServiceData(userdata);
   };
-
-  const addCodeToStorage = async () => {
-    if (isInAction) return;
-    const valid = await validateCode(code);
-    if (valid) {
-      if (validateExpiration(expiration)) {
-        setIsInAction(true);
-        const result = await addCode(code, expiration);
-        console.log(result);
-        if (result == "success") {
-          await refreshCodes();
-          setIsInAction(false);
-          toast.success("Code Successfully Added");
-        } else {
-          setIsInAction(false);
-          toast.error("Something went wrong during saving code");
-        }
-      } else {
-        setIsInAction(false);
-        toast.error("Invalid Expiration Date");
-      }
-    } else {
-      setIsInAction(false);
-      toast.error("Invalid Code");
-    }
-  };
-
-  const updateExpirationDate = async () => {
-    if (isInAction) return;
-    if (validateExpiration(updatedExpiration)) {
-      setIsInAction(true);
-      const result = await updateExpiration(codeForUpdate, updatedExpiration);
-      console.log(result);
-      if (result == true) {
-        setIsOpenEditModal(false);
-        setIsInAction(false);
-        await refreshCodes();
-        toast.success("Expiration Date Successfully Updated");
-      } else {
-        setIsInAction(false);
-        toast.error("Something went wrong during updating");
-      }
-    } else {
-      setIsInAction(false);
-      toast.error("Invalid Expiration Date");
-    }
-  };
-
-  const deleteCodeFromStorage = async (code) => {
-    const result = await deleteCode(code);
-    console.log(result);
-    if (result == "success") {
-      await refreshCodes();
-      toast.success("Code Successfully Deleted");
-    } else {
-      toast.error("Something went wrong during deleting code");
-    }
-  };
-  // const getFluxData = async(item) => {
-
-  // }
 
   const refreshCodes = async () => {
     const result = await getCodes();
@@ -201,79 +113,6 @@ const Profile = () => {
               <BannerTitle>{auth?.email}</BannerTitle>
             </BannerContainer>
           </Banner>
-          <ReferalCodeSection>
-            <DefaultTitle>Referal Code</DefaultTitle>
-            <ReferalAreaRow>
-              <DefaultText>Code:</DefaultText>
-              <DefaultTextBold>{code}</DefaultTextBold>
-              <DefaultText>
-                {isValid ? (
-                  <span style={{ color: "green" }}>Valid</span>
-                ) : (
-                  <span style={{ color: "red" }}>Invalid</span>
-                )}
-              </DefaultText>
-              <DefaultText>
-                Expiration Date:{" "}
-                <input
-                  type="date"
-                  value={expiration}
-                  min={`2023-08-09`}
-                  onChange={(e) => setExpiration(e.target.value)}
-                />
-              </DefaultText>
-              <GenerateNewCodeButton onClick={generateNewCode}>
-                Generate New Code
-              </GenerateNewCodeButton>
-              <AddCodeButton onClick={addCodeToStorage}>Save</AddCodeButton>
-            </ReferalAreaRow>
-            <CodeRow>
-              <DefaultTextBold>Code</DefaultTextBold>
-              <DefaultTextBold>Expiration Date</DefaultTextBold>
-              <DefaultTextBold>Status</DefaultTextBold>
-              <DefaultTextBold>Used</DefaultTextBold>
-              <DefaultTextBold>Action</DefaultTextBold>
-              {codes.map((item, key) => {
-                return (
-                  <>
-                    <DefaultText>{item.code}</DefaultText>
-                    <DefaultText>
-                      {dateToString(new Date(item.expiration))}
-                    </DefaultText>
-                    <DefaultText>
-                      {new Date() > new Date(item.expiration)
-                        ? "Expired"
-                        : "Valid"}
-                    </DefaultText>
-                    <DefaultText>{item.used.length} Times</DefaultText>
-                    <ActionRow>
-                      <ActionButton>
-                        <AiOutlineEdit
-                          size={20}
-                          onClick={() => {
-                            setActiveCode(item);
-                            setUpdatedExpiration(
-                              dateToString(new Date(item.expiration))
-                            );
-                            setCodeForUpdate(item.code);
-                            setIsOpenEditModal(true);
-                          }}
-                        />
-                      </ActionButton>
-                      <ActionButton>
-                        <AiOutlineDelete
-                          size={20}
-                          onClick={() => {
-                            deleteCodeFromStorage(item.code);
-                          }}
-                        />
-                      </ActionButton>
-                    </ActionRow>
-                  </>
-                );
-              })}
-            </CodeRow>
-          </ReferalCodeSection>
           <WrapperContainer>
             {userServiceData &&
               userServiceData?.map((item, key) => (
@@ -318,45 +157,6 @@ const Profile = () => {
               ))}
           </WrapperContainer>
         </>
-      )}
-      {isOpenEditModal && (
-        <ModalWrapper>
-          <EditModalWrapper>
-            <DefaultTitle>Edit Code Expiration Date</DefaultTitle>
-            <ModalCloseButton
-              onClick={() => {
-                setIsOpenEditModal(false);
-              }}
-            >
-              <AiOutlineCloseCircle size={28} />
-            </ModalCloseButton>
-            {activeCode !== null && (
-              <EditDetails>
-                <DefaultText>Code: </DefaultText>
-                <DefaultTextBold>{activeCode.code}</DefaultTextBold>
-                <DefaultText>Expiration: </DefaultText>
-                <input
-                  type="date"
-                  min={dateToString(new Date(activeCode.expiration))}
-                  value={updatedExpiration}
-                  onChange={(e) => setUpdatedExpiration(e.target.value)}
-                />
-              </EditDetails>
-            )}
-            <EditActionGroup>
-              <EditModalActionButton
-                onClick={() => {
-                  setIsOpenEditModal(false);
-                }}
-              >
-                Cancel
-              </EditModalActionButton>
-              <EditModalActionButton onClick={updateExpirationDate}>
-                Save
-              </EditModalActionButton>
-            </EditActionGroup>
-          </EditModalWrapper>
-        </ModalWrapper>
       )}
     </Wrapper>
   );

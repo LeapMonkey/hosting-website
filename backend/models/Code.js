@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
 const CodeSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
   code: {
     type: String,
     required: true,
