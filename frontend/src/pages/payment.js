@@ -17,13 +17,11 @@ import bitcoin from "bitcoinjs-lib";
 import bitcoinMessage from "bitcoinjs-message";
 import { getRandomNumber } from "../utills";
 import { toast } from "react-toastify";
+import { validateCode } from "../action/code";
 
 const ServerInfo = () => {
   const location = useLocation();
-  const total =
-    location.state.flag === 1
-      ? location.state.data.price1
-      : location.state.data.price2;
+
   const cpu =
     location.state.flag === 1
       ? location.state.data.cpu1
@@ -36,18 +34,25 @@ const ServerInfo = () => {
     location.state.flag === 1
       ? location.state.data.ssd1
       : location.state.data.ssd2;
-  const checkout =
-    location.state.flag === 1
-      ? location.state.data.checkout1
-      : location.state.data.checkout2;
   const zelID = "1GLMJwdJEHySNwSqkC4iKpoBU215m7BkDk";
   const zelIDPrivatekey =
     "L3yGy6krc9VywytHCNEQfuMdpKrPzCfqW9knYAqCyGkKFxLnoXCE";
+  const [total, setTotal] = useState(
+    location.state.flag === 1
+      ? location.state.data.price1
+      : location.state.data.price2
+  );
+  const [checkout, setCheckout] = useState(
+    location.state.flag === 1
+      ? location.state.data.checkout1
+      : location.state.data.checkout2
+  );
   const [transactiondata, setTransactiondata] = useState("");
   const [registerhash, setRegisterhash] = useState("");
   const [servicenumber, setServiceNumber] = useState();
   const [code, setCode] = useState("");
   const [flag, setFlag] = useState();
+  const [isValidCode, setIsValidCode] = useState(false);
   const initialData = async () => {
     getFluxAuth();
     const data = await getServiceApi();
@@ -55,9 +60,46 @@ const ServerInfo = () => {
     setServiceNumber(data.serviceData.length);
   };
 
+  const checkCodeValidity = async () => {
+    if (code == "") {
+      return;
+    }
+    const valid = await validateCode(code);
+    setIsValidCode(valid);
+    if (valid) {
+      updatePriceData();
+    }
+  };
+
+  const updatePriceData = () => {
+    if (isValidCode) {
+      console.log(
+        "Total: ",
+        location.state.flag === 1
+          ? location.state.data.referralPrice1
+          : location.state.data.referralPrice2
+      );
+      console.log("State: ", location.state);
+      setTotal(
+        location.state.flag === 1
+          ? location.state.data.referralPrice1
+          : location.state.data.referralPrice2
+      );
+      setCheckout(
+        location.state.flag === 1
+          ? location.state.data.referralCheckout1
+          : location.state.data.referralCheckout2
+      );
+    }
+  };
+
   useEffect(() => {
     initialData();
   }, []);
+
+  useEffect(() => {
+    checkCodeValidity();
+  }, [code]);
 
   // const logoutdata = async () => {
   //   await fetch("https://api.runonflux.io/zelid/logoutcurrentsession", {

@@ -30,6 +30,7 @@ import {
 } from "../utills/getlocation";
 import Paypal from "../components/Paypal";
 import { gameitems } from "../assets/json/gamedata";
+import { validateCode } from "../action/code";
 
 const ServerInfo = () => {
   const location = useLocation();
@@ -47,6 +48,8 @@ const ServerInfo = () => {
   const [clickCheck, setClickCheck] = useState(false);
   const [priceData, setPriceData] = useState();
   const [checkoutdata, setCheckoutData] = useState();
+  const [code, setCode] = useState("");
+  const [isValidCode, setIsValidCode] = useState(false);
 
   console.log(isButtonDisabled, "isButtonDisabled");
   const getIpData = async () => {
@@ -321,6 +324,42 @@ const ServerInfo = () => {
     );
   };
 
+  const checkCodeValidity = async () => {
+    if (code == "") {
+      return;
+    }
+    const valid = await validateCode(code);
+    setIsValidCode(valid);
+    if (valid) {
+      updatePriceData();
+    }
+  };
+
+  const updatePriceData = () => {
+    if (isValidCode) {
+      const pricedata = gameitems.filter(
+        (item) => item.title === location.state.data.description
+      );
+      const suitabledata =
+        pricedata[0].cpu1 ===
+        (location.state.data?.components
+          ? location.state.data?.components[0].cpu
+          : location.state.data?.compose[0].cpu)
+          ? pricedata[0].referralPrice1
+          : pricedata[0].referralPrice2;
+
+      const checkout =
+        pricedata[0].cpu1 ===
+        (location.state.data?.components
+          ? location.state.data?.components[0].cpu
+          : location.state.data?.compose[0].cpu)
+          ? pricedata[0].referralCheckout1
+          : pricedata[0].referralCheckout2;
+      setPriceData(suitabledata);
+      setCheckoutData(checkout);
+    }
+  };
+
   useEffect(() => {
     getFluxAuth();
     getIpData();
@@ -347,6 +386,10 @@ const ServerInfo = () => {
     setPriceData(suitabledata);
     setCheckoutData(checkout);
   }, []);
+
+  useEffect(() => {
+    checkCodeValidity();
+  }, [code]);
 
   const getPossibleLocation = async () => {
     let possibleLocations = [];
@@ -437,7 +480,7 @@ const ServerInfo = () => {
   return (
     <Wrapper>
       <WrapperContainer>
-      <ServerInfoPart>
+        <ServerInfoPart>
           <Title>Server Information</Title>
           <Row>Server Name - {location.state.data.name}</Row>
           <Row>Description - {location.state.data.description}</Row>
@@ -453,10 +496,10 @@ const ServerInfo = () => {
           <Row>
             Port - {"34001"}
             {location.state.data?.components
-               ? location.state.data?.components[0]?.[0]?.ports
-                : location.state.data?.compose[0].ports[0]}
+              ? location.state.data?.components[0]?.[0]?.ports
+              : location.state.data?.compose[0].ports[0]}
           </Row>
-      </ServerInfoPart>
+        </ServerInfoPart>
         <ButtonGroup>
           <ColumnButton>
             <Title> Control</Title>
@@ -644,6 +687,14 @@ const ServerInfo = () => {
             padding="15px"
           />
         </ButtonGroup2>
+        <CostDetail>
+          <Title>Referal Code</Title>
+          <ReferalInput
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+        </CostDetail>
         {clickCheck && (
           <>
             <Paypal cost={priceData} setFlag={setFlag} />
@@ -696,6 +747,17 @@ const ServerInfoPart = styled(Column)`
 const Title = styled.div`
   font: 20px;
   margin-bottom: 5px;
+`;
+const CostDetail = styled(Row)`
+  gap: 20px;
+`;
+const ReferalInput = styled.input`
+  height: 40px;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 24px;
+  padding: 4px 6px;
 `;
 const ButtonGroup = styled(Row)`
   gap: 10px;
