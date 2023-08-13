@@ -687,16 +687,14 @@ const ServerInfo = () => {
             padding="15px"
           />
         </ButtonGroup2>
-        <CostDetail>
-          <Title>Referal Code</Title>
-          <ReferalInput
-            type="text"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
-        </CostDetail>
         {clickCheck && (
           <>
+            <ReferalInput
+              placeholder="Referal Code"
+              type="text"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+            />
             <Paypal cost={priceData} setFlag={setFlag} />
             <CoinbaseCommerceButton
               styled
