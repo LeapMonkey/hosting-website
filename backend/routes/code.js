@@ -19,26 +19,30 @@ router.post("/add", async (req, res) => {
 });
 
 router.post("/use", async (req, res) => {
-  // try {
-  //   const { code, userId } = req.body;
-  //   const codeDB = await Code.findOne({
-  //     code: code,
-  //     userId: userId,
-  //   });
-  //   if (!codeDB) {
-  //     return res.status(400).json({ message: "invalid code" });
-  //   }
-  //   if (codeDB.expiration < new Date()) {
-  //     return res.status(400).json({ message: "expired code" });
-  //   }
-  //   await Code.findOneAndUpdate(
-  //     { code: code, userId: userId },
-  //     { used: codeDB.used + 1 }
-  //   );
-  //   return res.status(200).json({ message: "success" });
-  // } catch (err) {
-  //   console.log(err);
-  // }
+  try {
+    const { code, userId } = req.body;
+    const codeDB = await Code.findOne({
+      code: code,
+      userId: userId,
+    });
+    if (!codeDB) {
+      return res.status(400).json({ message: "invalid code" });
+    }
+    if (codeDB.expiration < new Date()) {
+      return res.status(400).json({ message: "expired code" });
+    }
+    const used = [...codeDB.used];
+    used.push({
+      userId: userId,
+      servername: req.body.servername,
+      currentBlockData: req.body.currentBlockData,
+      date: new Date(),
+    });
+    await Code.findOneAndUpdate({ code: code, userId: userId }, { used: used });
+    return res.status(200).json({ message: "success" });
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 router.post("/validateCode", async (req, res) => {
@@ -47,7 +51,7 @@ router.post("/validateCode", async (req, res) => {
     console.log({ code });
     const codeDB = await Code.findOne({ code: code });
     console.log(codeDB);
-    if (!codeDB) {
+    if (codeDB) {
       return res.status(200).json({ success: true });
     } else {
       return res.status(200).json({ success: false });
