@@ -8,6 +8,7 @@ export const validateCode = async (code) => {
       code,
     });
     const data = result.data;
+    console.log(data);
     return data.success;
   } catch (error) {
     return error;
@@ -22,6 +23,24 @@ export const addCode = async (code, expiration) => {
       userId: user._id,
       code,
       expiration,
+    });
+    const data = result.data;
+    console.log(data);
+    return data.message;
+  } catch (error) {
+    return error;
+  }
+};
+
+export const codeUsedApi = async (code, servername, currentBlockData) => {
+  const auth = JSON.parse(localStorage.getItem("auth"));
+  const user = auth.user;
+  try {
+    const result = await axios.post(`${baseURL}/api/codes/use`, {
+      userId: user._id,
+      code,
+      servername,
+      currentBlockData,
     });
     const data = result.data;
     console.log(data);

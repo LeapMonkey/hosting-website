@@ -3,6 +3,7 @@ import { Column, Row } from "../components/Element";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import CoinbaseCommerceButton from "react-coinbase-commerce";
+import { FaCheck } from "react-icons/fa";
 import {
   currentBlock,
   getAppSpecification,
@@ -31,6 +32,7 @@ import {
 import Paypal from "../components/Paypal";
 import { gameitems } from "../assets/json/gamedata";
 import { validateCode } from "../action/code";
+import { codeUsedApi } from "../action/code";
 
 const ServerInfo = () => {
   const location = useLocation();
@@ -60,6 +62,8 @@ const ServerInfo = () => {
     if (flag === 1) {
       setClickCheck(false);
       setIsButtonDisabled(true);
+      const usdedCode = code;
+      const isValidUsedCode = isValidCode;
       const olddata = await getAppSpecification(location.state.data.name);
       console.log(olddata);
       const expire = await getExpire(location.state.data.name);
@@ -112,7 +116,6 @@ const ServerInfo = () => {
       if (transaction) {
         const service = await getServiceApi();
         console.log(service, "filter");
-
         const filterdata = service.serviceData.filter(
           (data) =>
             data.userid === authdata.user._id &&
@@ -125,10 +128,15 @@ const ServerInfo = () => {
           currentBlockData: expire + currentBlockData + 22000,
           servername: location.state.data.name,
         };
-
         await updateUserService(serviceData).then((res) =>
           toast.success("Updated")
         );
+        if (isValidUsedCode)
+          await codeUsedApi(
+            usdedCode,
+            location.state.data.name,
+            expire + currentBlockData + 22000
+          );
         // Start the timer
         const timerId = setTimeout(() => {
           setIsButtonDisabled(false);
@@ -694,6 +702,11 @@ const ServerInfo = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
+          {isValidCode ? (
+            <FaCheck style={{ color: "green" }} />
+          ) : (
+            <FaCheck style={{ color: "red" }} />
+          )}
         </CostDetail>
         {clickCheck && (
           <>

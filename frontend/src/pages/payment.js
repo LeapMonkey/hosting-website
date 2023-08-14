@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import getHash from "../utills/gethash";
 import { getServiceApi, serviceApi } from "../action/action";
+import { codeUsedApi } from "../action/code";
 import {
   currentBlock,
   getAmout,
@@ -16,6 +17,7 @@ import {
 import bitcoin from "bitcoinjs-lib";
 import bitcoinMessage from "bitcoinjs-message";
 import { getRandomNumber } from "../utills";
+import { FaCheck } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { validateCode } from "../action/code";
 
@@ -53,6 +55,10 @@ const ServerInfo = () => {
   const [code, setCode] = useState("");
   const [flag, setFlag] = useState();
   const [isValidCode, setIsValidCode] = useState(false);
+  const referralPrice =
+    location.state.flag === 1
+      ? location.state.data.referralPrice1
+      : location.state.data.referralPrice2;
   const initialData = async () => {
     getFluxAuth();
     const data = await getServiceApi();
@@ -119,6 +125,8 @@ const ServerInfo = () => {
 
   const handleButtonClick = async () => {
     const randomservice = Math.floor(Math.random() * 10000000 + 1);
+    const usdedCode = code;
+    const isValidUsedCode = isValidCode;
     const data = {
       type: "fluxappregister",
       version: 1,
@@ -216,13 +224,16 @@ const ServerInfo = () => {
       const authdata = JSON.parse(localStorage.getItem("auth"));
       // eslint-disable-next-line no-use-before-define
       const currentBlockData = await currentBlock();
+      const servername = `fluidservices${randomservice}`;
       const serviceData = {
         userid: authdata.user._id,
         name: location.state.data.title,
         currentBlockData: currentBlockData + 22000,
-        servername: `fluidservices${randomservice}`,
+        servername: servername,
       };
       await serviceApi(serviceData);
+      if (isValidUsedCode)
+        await codeUsedApi(usdedCode, servername, currentBlockData + 22000);
     }
   };
 
@@ -247,15 +258,23 @@ const ServerInfo = () => {
         </PriceDetail>
         <CostDetail>
           <Title>Total Cost</Title>
-          <BoldTitle>{total}</BoldTitle>
+          <BoldTitle>
+            {total} /{" "}
+            <span style={{ color: "red" }}>Referral Cost: {referralPrice}</span>
+          </BoldTitle>
         </CostDetail>
         <CostDetail>
-          <Title>Referal Code</Title>
+          <Title>Referral Code</Title>
           <ReferalInput
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}
           />
+          {isValidCode ? (
+            <FaCheck style={{ color: "green" }} />
+          ) : (
+            <FaCheck style={{ color: "red" }} />
+          )}
         </CostDetail>
 
         {flag === 1 ? (
