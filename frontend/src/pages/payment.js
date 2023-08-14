@@ -264,8 +264,9 @@ const ServerInfo = () => {
           </BoldTitle>
         </CostDetail>
         <CostDetail>
-          <Title>Referral Code</Title>
+          <Title>Referral Code: </Title>
           <ReferalInput
+            placeholder="Referal Code"
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}
