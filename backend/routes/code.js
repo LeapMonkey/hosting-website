@@ -21,9 +21,9 @@ router.post("/add", async (req, res) => {
 router.post("/use", async (req, res) => {
   try {
     const { code, userId } = req.body;
+    console.log({ code, userId });
     const codeDB = await Code.findOne({
       code: code,
-      userId: userId,
     });
     if (!codeDB) {
       return res.status(400).json({ message: "invalid code" });
@@ -38,7 +38,7 @@ router.post("/use", async (req, res) => {
       currentBlockData: req.body.currentBlockData,
       date: new Date(),
     });
-    await Code.findOneAndUpdate({ code: code, userId: userId }, { used: used });
+    await Code.findOneAndUpdate({ code: code }, { used: used });
     return res.status(200).json({ message: "success" });
   } catch (err) {
     console.log(err);
