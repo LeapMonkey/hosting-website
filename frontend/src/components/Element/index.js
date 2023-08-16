@@ -5,6 +5,7 @@ export const Row = styled.div`
   flex-direction: row;
   align-items: center;
   box-sizing: border-box;
+  font-size: 22px;
 `;
 export const Column = styled.div`
   display: flex;

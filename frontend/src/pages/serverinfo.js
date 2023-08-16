@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import CoinbaseCommerceButton from "react-coinbase-commerce";
 import { FaCheck } from "react-icons/fa";
+import YouTube from "react-youtube";
 import {
   currentBlock,
   getAppSpecification,
@@ -34,6 +35,12 @@ import { gameitems } from "../assets/json/gamedata";
 import { validateCode } from "../action/code";
 import { codeUsedApi } from "../action/code";
 
+const tabs = {
+  controls: "Controls",
+  settings: "Settings",
+  guides: "Guides",
+};
+
 const ServerInfo = () => {
   const location = useLocation();
   const [environment, setEnvironment] = useState();
@@ -52,11 +59,16 @@ const ServerInfo = () => {
   const [checkoutdata, setCheckoutData] = useState();
   const [code, setCode] = useState("");
   const [isValidCode, setIsValidCode] = useState(false);
+  const [activeTab, setActiveTab] = useState(tabs.controls);
 
   console.log(isButtonDisabled, "isButtonDisabled");
   const getIpData = async () => {
     const ipdata = await getIpaddress(location.state.data.name);
     setIpData(ipdata);
+  };
+  const onPlayerReady = (event) => {
+    // access to player in all event handlers via event.target
+    event.target.pauseVideo();
   };
   const updateExpireData = async () => {
     if (flag === 1) {
@@ -487,270 +499,386 @@ const ServerInfo = () => {
   }, [timer]);
   return (
     <Wrapper>
-      <WrapperContainer>
-        <ServerInfoPart>
-          <Title>Server Information</Title>
-          <Row>Server Name - {location.state.data.name}</Row>
-          <Row>Description - {location.state.data.description}</Row>
-          IPv4 - {ipData ? ipData[0].ip.split(":")[0] : "setting"}
-          {/* {ipData?.map((item, key) => (
+      <Sidebar>
+        <SidebarTab
+          active={activeTab === tabs.controls}
+          onClick={() => {
+            setActiveTab(tabs.controls);
+          }}
+        >
+          Controls
+        </SidebarTab>
+        <SidebarTab
+          active={activeTab === tabs.settings}
+          onClick={() => {
+            setActiveTab(tabs.settings);
+          }}
+        >
+          Settings
+        </SidebarTab>
+        <SidebarTab
+          active={activeTab === tabs.guides}
+          onClick={() => {
+            setActiveTab(tabs.guides);
+          }}
+        >
+          Guide's
+        </SidebarTab>
+      </Sidebar>
+      <ContentWrapper>
+        {activeTab === tabs.controls && (
+          <WrapperContainer>
+            <ServerInfoPart>
+              <Title>Server Information</Title>
+              <Row>Server Name - {location.state.data.name}</Row>
+              <Row>Description - {location.state.data.description}</Row>
+              IPv4 - {ipData ? ipData[0].ip.split(":")[0] : "setting"}
+              {/* {ipData?.map((item, key) => (
            <Row key={key}>
               - PORT -{" "}
             {location.state.data?.components[0].ports}
            </Row>
           ))} */}
-          {/* <Row>IPv4 - {ipData?.ipaddress}</Row> */}
-          {console.log(location.state.data)}
-          <Row>
-            Port - {"34001"}
-            {location.state.data?.components
-              ? location.state.data?.components[0]?.[0]?.ports
-              : location.state.data?.compose[0].ports[0]}
-          </Row>
-        </ServerInfoPart>
-        <ButtonGroup>
-          <ColumnButton>
-            <Title> Control</Title>
-            <Button
-              text="START"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleStartClick(location.state.data.name)}
-            />
-            <Button
-              text="STOP"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleStopClick(location.state.data.name)}
-            />
-            <Button
-              text="RESTART"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleRestartClick(location.state.data.name)}
-            />
-          </ColumnButton>
-          <ColumnButton>
-            <Title> Deployment Control </Title>
-            <Button
-              text="Reinstall"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleReinstallClick(location.state.data.name)}
-            />
+              {/* <Row>IPv4 - {ipData?.ipaddress}</Row> */}
+              {console.log(location.state.data)}
+              <Row>
+                Port - {"34001"}
+                {location.state.data?.components
+                  ? location.state.data?.components[0]?.[0]?.ports
+                  : location.state.data?.compose[0].ports[0]}
+              </Row>
+            </ServerInfoPart>
+            <ButtonGroup>
+              <ColumnButton>
+                <Title> Control</Title>
+                <Button
+                  text="START"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() => handleStartClick(location.state.data.name)}
+                />
+                <Button
+                  text="STOP"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() => handleStopClick(location.state.data.name)}
+                />
+                <Button
+                  text="RESTART"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() => handleRestartClick(location.state.data.name)}
+                />
+              </ColumnButton>
+              <ColumnButton>
+                <Title> Deployment Control </Title>
+                <Button
+                  text="Reinstall"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() => handleReinstallClick(location.state.data.name)}
+                />
 
-            <Button
-              text="Move Server"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleRedeployClick(location.state.data.name)}
-            />
-          </ColumnButton>
-          <ColumnButton>
-            <Title>Data Control</Title>
-            {/* <Button>Load Backup</Button> */}
-            <Button
-              text=" Clean SSD"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={() => handleHardRedeployClick(location.state.data.name)}
-            />
-          </ColumnButton>
-        </ButtonGroup>
-        <Title>Update</Title>
-        <ButtonGroup2>
-          <Input
-            placeholder="Server Name"
-            onChange={(e) => setServername(e.target.value)}
-          />
-          <Button
-            text="Set Name"
-            width="100%"
-            radius="6px"
-            fweight="500"
-            color="white"
-            fsize="16px"
-            padding="15px"
-            onClick={updateServerName}
-          />
-        </ButtonGroup2>
-        <ButtonGroup2>
-          <Input
-            placeholder="[`settings`]"
-            onChange={(e) => setEnvironment(e.target.value)}
-          />
-          <Button
-            text="Settings"
-            width="100%"
-            radius="6px"
-            fweight="500"
-            color="white"
-            fsize="16px"
-            padding="15px"
-            onClick={!isButtonDisabled ? updateEnvironmentData : undefined}
-            bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
-          />
-        </ButtonGroup2>
-        <ButtonGroup2>
-          {possibleLocations && (
-            <Select
-              placeholder="Geolocation"
-              className="basic-single"
-              classNamePrefix="select"
-              isSearchable="true"
-              options={continentsOptions("false", possibleLocations)}
-              onChange={(e) => {
-                setContinent(e);
-                setCountry("");
-                setRegion("");
-              }}
-            />
-          )}
-          {continent ? (
-            <Select
-              onChange={(e) => {
-                setCountry(e);
-                setRegion("");
-              }}
-              placeholder="Country"
-              className="basic-single"
-              classNamePrefix="select"
-              isSearchable="true"
-              value={[country]}
-              options={countriesOptions(
-                continent.value,
-                "false",
-                possibleLocations
-              )}
-            />
-          ) : (
-            <></>
-          )}
-          {continent && country && (
-            <Select
-              placeholder="Region"
-              className="basic-single"
-              classNamePrefix="select"
-              isSearchable="true"
-              value={[region]}
-              options={regionsOptions(
-                continent.value,
-                country.value,
-                "false",
-                possibleLocations
-              )}
-              onChange={(e) => {
-                setRegion(e);
-              }}
-            />
-          )}
-        </ButtonGroup2>
-        <ButtonGroup2>
-          {possibleLocations && (
-            <Button
-              text="Set Geolocation"
-              width="100%"
-              radius="6px"
-              fweight="500"
-              color="white"
-              fsize="16px"
-              padding="15px"
-              onClick={!isButtonDisabled ? updateGeolocationData : undefined}
-              bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
-            />
-          )}
-          <Button
-            onClick={!isButtonDisabled ? updateExpireData : undefined}
-            bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
-            text="Extend Rental"
-            width="100%"
-            radius="6px"
-            fweight="500"
-            color="white"
-            fsize="16px"
-            padding="15px"
-          />
-        </ButtonGroup2>
-        {clickCheck && (
-          <>
-            <CostDetail>
-              <ReferalInput
-                placeholder="Referal Code"
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
+                <Button
+                  text="Move Server"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() => handleRedeployClick(location.state.data.name)}
+                />
+              </ColumnButton>
+              <ColumnButton>
+                <Title>Data Control</Title>
+                {/* <Button>Load Backup</Button> */}
+                <Button
+                  text=" Clean SSD"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={() =>
+                    handleHardRedeployClick(location.state.data.name)
+                  }
+                />
+              </ColumnButton>
+            </ButtonGroup>
+            <Title>Update</Title>
+            <ButtonGroup2>
+              <Input
+                placeholder="Server Name"
+                onChange={(e) => setServername(e.target.value)}
               />
-              {isValidCode ? (
-                <FaCheck style={{ color: "green" }} />
-              ) : (
-                <FaCheck style={{ color: "red" }} />
+              <Button
+                text="Set Name"
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="white"
+                fsize="16px"
+                padding="15px"
+                onClick={updateServerName}
+              />
+            </ButtonGroup2>
+            <ButtonGroup2>
+              <Input
+                placeholder="[`settings`]"
+                onChange={(e) => setEnvironment(e.target.value)}
+              />
+              <Button
+                text="Settings"
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="white"
+                fsize="16px"
+                padding="15px"
+                onClick={!isButtonDisabled ? updateEnvironmentData : undefined}
+                bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
+              />
+            </ButtonGroup2>
+            <ButtonGroup2>
+              {possibleLocations && (
+                <Select
+                  placeholder="Geolocation"
+                  className="basic-single"
+                  classNamePrefix="select"
+                  isSearchable="true"
+                  options={continentsOptions("false", possibleLocations)}
+                  onChange={(e) => {
+                    setContinent(e);
+                    setCountry("");
+                    setRegion("");
+                  }}
+                />
               )}
-            </CostDetail>
-            {/* {clickCheck && ( */}
-            <Paypal cost={priceData} setFlag={setFlag} />
-            <CoinbaseCommerceButton
-              styled
-              // checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
-              checkoutId={checkoutdata}
-              // chargeId="CWL2LG2J"
-              onChargeSuccess={(data) => {
-                console.log(data);
-                setFlag(1);
-              }}
-              onChargeFailure={(data) => {
-                console.log(data);
-              }}
-              onPaymentDetected={(data) => {
-                console.log(data);
-              }}
-              onModalClosed={() => {
-                console.log("Payment Cancelled");
-              }}
-            />
-          </>
+              {continent ? (
+                <Select
+                  onChange={(e) => {
+                    setCountry(e);
+                    setRegion("");
+                  }}
+                  placeholder="Country"
+                  className="basic-single"
+                  classNamePrefix="select"
+                  isSearchable="true"
+                  value={[country]}
+                  options={countriesOptions(
+                    continent.value,
+                    "false",
+                    possibleLocations
+                  )}
+                />
+              ) : (
+                <></>
+              )}
+              {continent && country && (
+                <Select
+                  placeholder="Region"
+                  className="basic-single"
+                  classNamePrefix="select"
+                  isSearchable="true"
+                  value={[region]}
+                  options={regionsOptions(
+                    continent.value,
+                    country.value,
+                    "false",
+                    possibleLocations
+                  )}
+                  onChange={(e) => {
+                    setRegion(e);
+                  }}
+                />
+              )}
+            </ButtonGroup2>
+            <ButtonGroup2>
+              {possibleLocations && (
+                <Button
+                  text="Set Geolocation"
+                  width="100%"
+                  radius="6px"
+                  fweight="500"
+                  color="white"
+                  fsize="16px"
+                  padding="15px"
+                  onClick={
+                    !isButtonDisabled ? updateGeolocationData : undefined
+                  }
+                  bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
+                />
+              )}
+              <Button
+                onClick={!isButtonDisabled ? updateExpireData : undefined}
+                bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
+                text="Extend Rental"
+                width="100%"
+                radius="6px"
+                fweight="500"
+                color="white"
+                fsize="16px"
+                padding="15px"
+              />
+            </ButtonGroup2>
+            {clickCheck && (
+              <>
+                <CostDetail>
+                  <ReferalInput
+                    placeholder="Referal Code"
+                    type="text"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                  {isValidCode ? (
+                    <FaCheck style={{ color: "green" }} />
+                  ) : (
+                    <FaCheck style={{ color: "red" }} />
+                  )}
+                </CostDetail>
+                {/* {clickCheck && ( */}
+                <Paypal cost={priceData} setFlag={setFlag} />
+                <CoinbaseCommerceButton
+                  styled
+                  // checkoutId="c632fe45-0566-48e8-9fdc-59c35b7234ca"
+                  checkoutId={checkoutdata}
+                  // chargeId="CWL2LG2J"
+                  onChargeSuccess={(data) => {
+                    console.log(data);
+                    setFlag(1);
+                  }}
+                  onChargeFailure={(data) => {
+                    console.log(data);
+                  }}
+                  onPaymentDetected={(data) => {
+                    console.log(data);
+                  }}
+                  onModalClosed={() => {
+                    console.log("Payment Cancelled");
+                  }}
+                />
+              </>
+            )}
+          </WrapperContainer>
         )}
-      </WrapperContainer>
+        {activeTab === tabs.settings && <WrapperContainer></WrapperContainer>}
+        {activeTab === tabs.guides && (
+          <WrapperContainer>
+            <GuideLinkGroup>
+              <GuideLink
+                target="_blank"
+                href="https://www.youtube.com/channel/UC8SYbJEmrQt6JlwM8Vub2Ww"
+              >
+                Youtube
+              </GuideLink>
+              <GuideLink target="_blank" href="#">
+                Instagram
+              </GuideLink>
+              <GuideLink
+                target="_blank"
+                href="https://www.tiktok.com/@cube_hosting?is_from_webapp=1&sender_device=pc"
+              >
+                Ticktok
+              </GuideLink>
+            </GuideLinkGroup>
+            <Row>Using Controls and Settings</Row>
+            <YouTube videoId="2g811Eo7K8U" onReady={onPlayerReady} />
+            <AdvancedDocumentation target="_blank" href="#">
+              Advanced Documentation
+            </AdvancedDocumentation>
+          </WrapperContainer>
+        )}
+      </ContentWrapper>
     </Wrapper>
   );
 };
+
 const Wrapper = styled(Column)`
   background-color: #313131;
   width: 100%;
   color: white;
-  padding: 20px;
-  gap: 20px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: row;
 `;
+
+const Sidebar = styled.div`
+  width: 250px;
+  height: 100vh;
+  background-color: #2f2f2f;
+  padding-top: 100px;
+`;
+
+const SidebarTab = styled.div`
+  width: 100%;
+  height: 90px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 500;
+  background-color: ${(props) => {
+    return props.active === true ? "#212121" : "#2f2f2f";
+  }};
+  cursor: pointer;
+`;
+
+const ContentWrapper = styled.div`
+  width: calc(100% - 250px);
+  height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const GuideLinkGroup = styled.div`
+  height: 120px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+`;
+
+const GuideLink = styled.a`
+  color: white;
+  font-size: 24px;
+  text-decoration: none;
+`;
+
+const AdvancedDocumentation = styled.a`
+  color: #28acf6;
+  font-size: 22px;
+  text-decoration: none;
+  margin-top: 30px;
+`;
+
 const WrapperContainer = styled(Column)`
   gap: 20px;
   justify-content: center;
   align-items: flex-start;
   max-width: 900px;
-  width: 100%;
+  width: 95%;
   margin-top: 100px;
 `;
 
@@ -759,7 +887,8 @@ const ServerInfoPart = styled(Column)`
   align-items: flex-start;
 `;
 const Title = styled.div`
-  font: 20px;
+  font-size: 24px;
+  font-weight: 700;
   margin-bottom: 5px;
 `;
 const CostDetail = styled(Row)`
