@@ -24,7 +24,7 @@ import Input from "../components/Element/input";
 import { getServiceApi, updateUserService } from "../action/action";
 import { toast } from "react-toastify";
 import Button from "../components/Element/button";
-import Select, { createFilter } from "react-select";
+import Select, { createFilter, StylesConfig } from "react-select";
 import {
   continentsOptions,
   countriesOptions,
@@ -779,7 +779,57 @@ const ServerInfo = () => {
             )}
           </WrapperContainer>
         )}
-        {activeTab === tabs.settings && <WrapperContainer></WrapperContainer>}
+        {activeTab === tabs.settings && (
+          <WrapperContainer>
+            <SettingsWrapper>
+              <SettingsTopArea>
+                <SettingsDetails>
+                  <SettingsControl>
+                    <Title>Game</Title>
+                    <Select
+                      options={[{ value: "cho", label: "MINECRAFT: JAVA" }]}
+                    />
+                  </SettingsControl>
+                  <SettingsControl>
+                    <Title>Password</Title>
+                    <SettingsInput type="password" placeholder="Password" />
+                  </SettingsControl>
+                  <SettingsControl>
+                    <Title>Game Version</Title>
+                    <Select
+                      options={[{ value: "cho", label: "Version: 1.12.1" }]}
+                    />
+                  </SettingsControl>
+                  <SettingsControl>
+                    <Title>Addons / Mods</Title>
+                    <Select options={[{ value: "cho", label: "Addon" }]} />
+                  </SettingsControl>
+                  <SettingsControl>
+                    <Title>Set Admin</Title>
+                    <SettingsInput type="text" placeholder="Admin" />
+                  </SettingsControl>
+                </SettingsDetails>
+                <ApplySettingsArea>
+                  <ApplySettingsButton>Apply Settings</ApplySettingsButton>
+                  <ApplySettingsDescription>
+                    Changing Game type, Game Version, and or Addons / Mods will
+                    delete current save files
+                  </ApplySettingsDescription>
+                </ApplySettingsArea>
+              </SettingsTopArea>
+              <SettingsBottomArea>
+                <SettingsControl>
+                  <Title>Advanced V</Title>
+                  <SettingsInput
+                    type="text"
+                    style={{ width: "100%" }}
+                    placeholder="Fill Current Settings Array"
+                  />
+                </SettingsControl>
+              </SettingsBottomArea>
+            </SettingsWrapper>
+          </WrapperContainer>
+        )}
         {activeTab === tabs.guides && (
           <WrapperContainer>
             <GuideLinkGroup>
@@ -825,6 +875,82 @@ const Sidebar = styled.div`
   height: 100vh;
   background-color: #2f2f2f;
   padding-top: 100px;
+`;
+
+const SettingsWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const SettingsTopArea = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 14px;
+`;
+
+const SettingsBottomArea = styled.div`
+  width: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 50px;
+`;
+
+const SettingsControl = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const SettingsInput = styled.input`
+  height: 50px;
+  width: 400px;
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  background-color: #272727;
+`;
+
+const ApplySettingsArea = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const ApplySettingsDescription = styled.div`
+  font-size: 20px;
+  color: white;
+  text-align: center;
+  width: 200px;
+`;
+
+const ApplySettingsButton = styled.div`
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
+  background-color: #00cfc8;
+  border-radius: 8px;
+  cursor: pointer;
+`;
+
+const SettingsDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 24px;
+  color: white;
 `;
 
 const SidebarTab = styled.div`
@@ -879,7 +1005,7 @@ const WrapperContainer = styled(Column)`
   align-items: flex-start;
   max-width: 900px;
   width: 95%;
-  margin-top: 100px;
+  margin-top: 140px;
 `;
 
 const ServerInfoPart = styled(Column)`
