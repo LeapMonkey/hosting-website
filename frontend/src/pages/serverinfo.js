@@ -32,6 +32,15 @@ import {
 } from "../utills/getlocation";
 import Paypal from "../components/Paypal";
 import { gameitems } from "../assets/json/gamedata";
+import {
+  minecraftVersionOptions,
+  arkVersionOptions,
+  valheimVersionOptions,
+  gamesOptions,
+  minecraftMods,
+  valheimMods,
+  arkMods,
+} from "../assets/json/settings";
 import { validateCode } from "../action/code";
 import { codeUsedApi } from "../action/code";
 
@@ -41,9 +50,13 @@ const tabs = {
   guides: "Guides",
 };
 
+const selectorStyles = {
+  option: (styles) => ({ ...styles, color: "black" }),
+};
+
 const ServerInfo = () => {
   const location = useLocation();
-  const [environment, setEnvironment] = useState();
+  const [environment, setEnvironment] = useState([]);
   const [servername, setServername] = useState();
   const [ipData, setIpData] = useState();
   const [possibleLocations, setPossibleLocations] = useState();
@@ -60,6 +73,15 @@ const ServerInfo = () => {
   const [code, setCode] = useState("");
   const [isValidCode, setIsValidCode] = useState(false);
   const [activeTab, setActiveTab] = useState(tabs.controls);
+  const [settingsGame, setSettingsGame] = useState("minecraft");
+  const [settingsVersionOptions, setSettingsVersionOptions] = useState(
+    minecraftVersionOptions
+  );
+  const [settingsModes, setSettingsModes] = useState(minecraftMods);
+  const [settingsPassword, setSettingsPassword] = useState("");
+  const [settingsAdmins, setSettingsAdmins] = useState("");
+  const [settingsVersion, setSettingsVersion] = useState([]);
+  const [settingsAddons, setSettingsAddons] = useState([]);
 
   console.log(isButtonDisabled, "isButtonDisabled");
   const getIpData = async () => {
@@ -162,7 +184,7 @@ const ServerInfo = () => {
   };
   console.log(location.state.data);
   const updateEnvironmentData = async () => {
-    if (!environment) {
+    if (!environment || environment.length == 0 || environment == [""]) {
       return toast.error("Please input Environment");
     }
     setIsButtonDisabled(true);
@@ -355,6 +377,53 @@ const ServerInfo = () => {
     }
   };
 
+  const onGameChangedHandler = (game) => {
+    setSettingsGame(game);
+    setSettingsPassword("");
+    setSettingsAdmins("");
+    setSettingsAddons([]);
+    setSettingsVersion([]);
+    if (game === "minecraft") {
+      setSettingsVersionOptions(minecraftVersionOptions);
+      setSettingsModes(minecraftMods);
+    } else if (game === "ark") {
+      setSettingsVersionOptions(arkVersionOptions);
+      setSettingsModes(arkMods);
+    } else {
+      setSettingsVersionOptions(valheimVersionOptions);
+      setSettingsModes(valheimMods);
+    }
+    setEnvironment([]);
+  };
+
+  const onAddonChangedHandler = (addons) => {
+    setSettingsAddons(addons);
+  };
+
+  const onVersionChangedHandler = (version) => {
+    setSettingsVersion(version);
+  };
+
+  const onPasswordChangedHandler = (password) => {
+    if (settingsGame === "minecraft") {
+      setSettingsPassword(`RCON_PASSWORD=${password}`);
+    } else if (settingsGame === "ark") {
+      setSettingsPassword(`SERVER_PASSWORD=${password}`);
+    } else {
+      setSettingsPassword(`SERVER_PASS=${password}`);
+    }
+  };
+
+  const onAdminChangedHandler = (admin) => {
+    if (settingsGame === "minecraft") {
+      setSettingsAdmins(`OPS=${admin}`);
+    } else if (settingsGame === "ark") {
+      setSettingsAdmins(`ADMINS=${admin}`);
+    } else {
+      setSettingsAdmins(`ADMINLIST_IDS=${admin}`);
+    }
+  };
+
   const updatePriceData = () => {
     if (isValidCode) {
       const pricedata = gameitems.filter(
@@ -471,6 +540,7 @@ const ServerInfo = () => {
       }
     }
   };
+
   useEffect(() => {
     let text = "";
     if (continent !== "ALL") {
@@ -490,6 +560,15 @@ const ServerInfo = () => {
     // region && text = text+ region;
     setGeolocationData([text], "Adsf");
   }, [continent, country, region]);
+
+  useEffect(() => {
+    setEnvironment([
+      settingsPassword,
+      ...settingsVersion,
+      ...settingsAddons,
+      settingsAdmins,
+    ]);
+  }, [settingsPassword, settingsVersion, settingsAddons, settingsAdmins]);
 
   console.log(geolocationData);
   useEffect(() => {
@@ -640,7 +719,7 @@ const ServerInfo = () => {
                 onClick={updateServerName}
               />
             </ButtonGroup2>
-            <ButtonGroup2>
+            {/* <ButtonGroup2>
               <Input
                 placeholder="[`settings`]"
                 onChange={(e) => setEnvironment(e.target.value)}
@@ -656,7 +735,7 @@ const ServerInfo = () => {
                 onClick={!isButtonDisabled ? updateEnvironmentData : undefined}
                 bgcolor={isButtonDisabled === true && "rgb(255,255,255,0.3)"}
               />
-            </ButtonGroup2>
+            </ButtonGroup2> */}
             <ButtonGroup2>
               {possibleLocations && (
                 <Select
@@ -787,30 +866,58 @@ const ServerInfo = () => {
                   <SettingsControl>
                     <Title>Game</Title>
                     <Select
-                      options={[{ value: "cho", label: "MINECRAFT: JAVA" }]}
+                      styles={selectorStyles}
+                      options={gamesOptions}
+                      onChange={(e) => {
+                        onGameChangedHandler(e.value);
+                      }}
                     />
                   </SettingsControl>
                   <SettingsControl>
                     <Title>Password</Title>
-                    <SettingsInput type="password" placeholder="Password" />
+                    <SettingsInput
+                      type="password"
+                      placeholder="Password"
+                      onChange={(e) => {
+                        onPasswordChangedHandler(e.target.value);
+                      }}
+                    />
                   </SettingsControl>
                   <SettingsControl>
                     <Title>Game Version</Title>
                     <Select
-                      options={[{ value: "cho", label: "Version: 1.12.1" }]}
+                      styles={selectorStyles}
+                      options={settingsVersionOptions}
+                      onChange={(e) => {
+                        onVersionChangedHandler(e.value);
+                      }}
                     />
                   </SettingsControl>
                   <SettingsControl>
                     <Title>Addons / Mods</Title>
-                    <Select options={[{ value: "cho", label: "Addon" }]} />
+                    <Select
+                      styles={selectorStyles}
+                      options={settingsModes}
+                      onChange={(e) => {
+                        onAddonChangedHandler(e.value);
+                      }}
+                    />
                   </SettingsControl>
                   <SettingsControl>
                     <Title>Set Admin</Title>
-                    <SettingsInput type="text" placeholder="Admin" />
+                    <SettingsInput
+                      type="text"
+                      placeholder="Admin"
+                      onChange={(e) => {
+                        onAdminChangedHandler(e.target.value);
+                      }}
+                    />
                   </SettingsControl>
                 </SettingsDetails>
                 <ApplySettingsArea>
-                  <ApplySettingsButton>Apply Settings</ApplySettingsButton>
+                  <ApplySettingsButton onClick={updateEnvironmentData}>
+                    Apply Settings
+                  </ApplySettingsButton>
                   <ApplySettingsDescription>
                     Changing Game type, Game Version, and or Addons / Mods will
                     delete current save files
@@ -822,6 +929,8 @@ const ServerInfo = () => {
                   <Title>Advanced V</Title>
                   <SettingsInput
                     type="text"
+                    value={JSON.stringify(environment)}
+                    disabled
                     style={{ width: "100%" }}
                     placeholder="Fill Current Settings Array"
                   />
