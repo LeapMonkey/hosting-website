@@ -404,24 +404,12 @@ const ServerInfo = () => {
     setSettingsVersion(version);
   };
 
-  const onPasswordChangedHandler = (password) => {
-    if (settingsGame === "minecraft") {
-      setSettingsPassword(`RCON_PASSWORD=${password}`);
-    } else if (settingsGame === "ark") {
-      setSettingsPassword(`SERVER_PASSWORD=${password}`);
-    } else {
-      setSettingsPassword(`SERVER_PASS=${password}`);
-    }
+  const onPasswordChangedHandler = (_password) => {
+    setSettingsPassword(_password);
   };
 
-  const onAdminChangedHandler = (admin) => {
-    if (settingsGame === "minecraft") {
-      setSettingsAdmins(`OPS=${admin}`);
-    } else if (settingsGame === "ark") {
-      setSettingsAdmins(`ADMINS=${admin}`);
-    } else {
-      setSettingsAdmins(`ADMINLIST_IDS=${admin}`);
-    }
+  const onAdminChangedHandler = (_admin) => {
+    setSettingsAdmins(`${_admin}`);
   };
 
   const updatePriceData = () => {
@@ -562,12 +550,39 @@ const ServerInfo = () => {
   }, [continent, country, region]);
 
   useEffect(() => {
-    setEnvironment([
-      settingsPassword,
-      ...settingsVersion,
-      ...settingsAddons,
-      settingsAdmins,
-    ]);
+    let password_ = null,
+      admins_ = null;
+    console.log({ settingsPassword, settingsAdmins });
+    if (settingsPassword !== "")
+      if (settingsGame === "minecraft") {
+        password_ = `RCON_PASSWORD=${settingsPassword}`;
+      } else if (settingsGame === "ark") {
+        password_ = `SERVER_PASSWORD=${settingsPassword}`;
+      } else {
+        password_ = `SERVER_PASS=${settingsPassword}`;
+      }
+    if (settingsAdmins !== "")
+      if (settingsGame === "minecraft") {
+        admins_ = `OPS=${settingsAdmins}`;
+      } else if (settingsGame === "ark") {
+        admins_ = `ADMINS=${settingsAdmins}`;
+      } else {
+        admins_ = `ADMINLIST_IDS=${settingsAdmins}`;
+      }
+    if (password_ !== null && admins_ !== null) {
+      setEnvironment([
+        password_,
+        ...settingsVersion,
+        ...settingsAddons,
+        admins_,
+      ]);
+    } else if (password_ === null && admins_ !== null) {
+      setEnvironment([...settingsVersion, ...settingsAddons, admins_]);
+    } else if (password_ !== null && admins_ === null) {
+      setEnvironment([password_, ...settingsVersion, ...settingsAddons]);
+    } else {
+      setEnvironment([...settingsVersion, ...settingsAddons]);
+    }
   }, [settingsPassword, settingsVersion, settingsAddons, settingsAdmins]);
 
   console.log(geolocationData);
