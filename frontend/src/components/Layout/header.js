@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import { Column, DefaultImage, Row } from "../Element";
 import { BiMenu } from "react-icons/bi";
 import { Logo } from "../Image";
@@ -22,10 +23,18 @@ let items = [
 
 const Header = () => {
   const [mobileFlag, setMobileFlag] = useState(false);
+  const [auth, setAuth] = useState(JSON.parse(localStorage.getItem("auth")));
   const navigate = useNavigate();
   const location = useLocation();
   const handleClick = () => {
     navigate("/");
+  };
+  const userCheckAndNavigate = (path) => {
+    if (auth) navigate(path);
+    else {
+      toast.error("Please login first");
+      navigate("/login");
+    }
   };
   const handleChangePath = (item) => {};
   console.log(location.pathname);
@@ -36,17 +45,34 @@ const Header = () => {
         <ItemWrapper>
           {items?.map((item, key) =>
             location.pathname === item.href ? (
-              <ItemContent href={item.href} key={key} flag="1">
+              <ItemContent
+                onClick={() => {
+                  if (item.href === "/profile") userCheckAndNavigate(item.href);
+                  else navigate(item.href);
+                }}
+                key={key}
+                flag="1"
+              >
                 {item.title}
               </ItemContent>
             ) : (
-              <ItemContent href={item.href} key={key}>
+              <ItemContent
+                onClick={() => {
+                  if (item.href === "/profile") userCheckAndNavigate(item.href);
+                  else navigate(item.href);
+                }}
+                key={key}
+              >
                 {item.title}
               </ItemContent>
             )
           )}
         </ItemWrapper>
-        <ItemContent href="/login">
+        <ItemContent
+          onClick={() => {
+            navigate("/login");
+          }}
+        >
           <DefaultImage src="https://minotar.net/helm/MHF_Steve/24.png" />
           <>Login</>
         </ItemContent>
@@ -130,12 +156,14 @@ const MenuDiv = styled(Row)`
   z-index: 1;
 `;
 
-const ItemContent = styled.a`
+const ItemContent = styled.div`
   font-size: 14px;
   font-weight: 600;
   line-height: 64px;
   text-align: center;
   min-width: 10vw;
+  cursor: pointer;
+  color: white;
   background: ${(props) => props.flag && "rgba(0, 0, 0, 0.3)"};
   :hover {
     background: rgba(0, 0, 0, 0.3);

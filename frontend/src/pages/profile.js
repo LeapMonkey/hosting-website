@@ -76,7 +76,8 @@ const Profile = () => {
       initialData();
       getFluxAuth();
     } else {
-      alert("please login");
+      toast.error("Please login first");
+      navigate("/login");
     }
     refreshCodes();
   }, []);
