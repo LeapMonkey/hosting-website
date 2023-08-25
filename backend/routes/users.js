@@ -90,4 +90,26 @@ router.post("/adduser", async (req, res) => {
   }
 });
 
+router.post("/checkValidUser", async (req, res) => {
+  try {
+    const userInfo = req.body.data;
+    const user = await User.findOne({ email: userInfo });
+    const user2 = await User.findOne({ username: userInfo });
+    if (!user && !user2) {
+      return res.status(200).json({
+        success: false,
+        message: "Not Exist",
+      });
+    }
+    const sendData = user ? user : user2;
+    return res.status(200).json({
+      success: true,
+      message: "Exist",
+      data: sendData,
+    });
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
 export default router;

@@ -21,7 +21,6 @@ router.post("/add", async (req, res) => {
 router.post("/use", async (req, res) => {
   try {
     const { code, userId } = req.body;
-    console.log({ code, userId });
     const codeDB = await Code.findOne({
       code: code,
     });
@@ -48,9 +47,7 @@ router.post("/use", async (req, res) => {
 router.post("/validateCode", async (req, res) => {
   try {
     const { code } = req.body;
-    console.log({ code });
     const codeDB = await Code.findOne({ code: code });
-    console.log(codeDB);
     if (codeDB) {
       return res.status(200).json({ success: true });
     } else {
