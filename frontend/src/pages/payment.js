@@ -3,7 +3,7 @@ import { Column, Row } from "../components/Element";
 import Button from "../components/Element/button";
 import Paypal from "../components/Paypal";
 import CoinbaseCommerceButton from "react-coinbase-commerce";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import getHash from "../utills/gethash";
 import { getServiceApi, serviceApi } from "../action/action";
@@ -23,6 +23,7 @@ import { validateCode } from "../action/code";
 
 const ServerInfo = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const cpu =
     location.state.flag === 1
@@ -127,6 +128,7 @@ const ServerInfo = () => {
     const randomservice = Math.floor(Math.random() * 10000000 + 1);
     const usdedCode = code;
     const isValidUsedCode = isValidCode;
+    toast.info("Registering Service");
     const data = {
       type: "fluxappregister",
       version: 1,
@@ -235,6 +237,8 @@ const ServerInfo = () => {
       if (isValidUsedCode)
         await codeUsedApi(usdedCode, servername, currentBlockData + 22000);
     }
+    toast.success("Successfully Registered Your Service");
+    navigate("/profile");
   };
 
   return (
@@ -293,11 +297,10 @@ const ServerInfo = () => {
                     padding="15px"
                     onClick={handleButtonClick}
                   />
-                  {registerhash.message}
                 </Column>
               ) : (
                 <Button
-                  text={<>Please check {transactiondata} link</>}
+                  text={<>Please check link</>}
                   width="100%"
                   radius="6px"
                   fweight="500"
@@ -329,13 +332,16 @@ const ServerInfo = () => {
               // chargeId="CWL2LG2J"
               onChargeSuccess={(data) => {
                 console.log(data);
+                toast.success("Payment Successfully Received");
                 setFlag(1);
               }}
               onChargeFailure={(data) => {
                 console.log(data);
+                toast.error("Something went wrong during purchaging");
               }}
               onPaymentDetected={(data) => {
                 setFlag(1);
+                toast.success("Payment Success");
               }}
               onModalClosed={() => {
                 console.log("Payment Cancelled");
